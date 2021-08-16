@@ -3,10 +3,6 @@ package wav
 type WAVFormat struct {
 }
 
-func (c WAVFormat) GetName() string {
-	return "WAVE"
-}
-
 type riffChunk struct {
 	chunkID   [4]byte // Chunk ID (should be 'RIFF')
 	chunkSize uint32  // File size - 8 (without Group ID and RIFF type)

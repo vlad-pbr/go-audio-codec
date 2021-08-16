@@ -1,19 +1,10 @@
 package codec
 
 import (
-	"github.com/vlad-pbr/go-audio-codec/pkg/codec/formats/wav"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format"
 )
 
-type formatIdentifier int
-
-const (
-	WAV formatIdentifier = iota
-)
-
-type Format interface {
-	GetName() string
-}
-
-var identifierToFormat = map[formatIdentifier]Format{
-	WAV: wav.WAVFormat{},
+func Decode(data []byte, source format.FormatIdentifier) audio.Audio {
+	return audio.Audio{}
 }
