@@ -48,3 +48,13 @@ func GetBytes(fields ...interface{}) []byte {
 
 	return output
 }
+
+func ContainsFourCC(slice []FourCC, fourCC FourCC) bool {
+	for _, item := range slice {
+		if bytes.Compare(item, fourCC) == 0 {
+			return true
+		}
+	}
+
+	return false
+}
