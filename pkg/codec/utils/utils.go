@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"bytes"
+	"encoding/gob"
+)
+
 type FourCC []byte
 
 type Chunk struct {
@@ -7,10 +12,13 @@ type Chunk struct {
 	ChunkSize int32
 }
 
+func (c Chunk) GetBytesWithHeaders(fields ...interface{}) []byte {
+	return append(GetBytes(c.ChunkID, c.ChunkSize), GetBytes(fields...)...)
+}
+
 type ChunkInterface interface {
 	GetID() FourCC
 	GetSize() int32
-	GetData() []byte
 	GetBytes() []byte
 }
 
@@ -22,9 +30,21 @@ func (c Chunk) GetSize() int32 {
 	return c.ChunkSize
 }
 
-// TODO generic GetBytes for chunk
-
 func GetBytes(fields ...interface{}) []byte {
-	// TODO convert all interfaces to single byte array, return
-	return []byte("placeholder")
+
+	var output []byte
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+
+	for _, field := range fields {
+
+		// convert interface to bytes
+		if err := encoder.Encode(field); err != nil {
+			panic(err)
+		}
+
+		output = append(output, buffer.Bytes()...)
+	}
+
+	return output
 }

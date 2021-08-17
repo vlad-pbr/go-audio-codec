@@ -1,5 +1,7 @@
 package wav
 
+import "github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
+
 type WAVFormat struct {
 }
 
@@ -24,4 +26,9 @@ type dataChunk struct {
 	chunkID   [4]byte // Chunk ID (should be 'data')
 	chunkSize uint32  // Number of bytes in the sample data portion
 	data      []byte  // Array of audio samples
+}
+
+// TODO implement
+func (f WAVFormat) Decode(bytes []byte) (audio.Audio, error) {
+	return audio.Audio{}, nil
 }

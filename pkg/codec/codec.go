@@ -5,6 +5,6 @@ import (
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format"
 )
 
-func Decode(data []byte, source format.FormatIdentifier) audio.Audio {
-	return audio.Audio{}
+func Decode(data []byte, identifier format.FormatIdentifier) (audio.Audio, error) {
+	return format.IdentifierToFormat[identifier].Decode(data)
 }
