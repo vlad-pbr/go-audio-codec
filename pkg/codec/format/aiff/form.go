@@ -14,8 +14,12 @@ var FORMTYPE utils.FourCC = []byte("AIFF")
 
 // possible local chunks, in order of precedence
 var LocalChunks = map[string]interface{}{
-	string(COMMONID): NewCommonChunk,
-	string(SOUNDID):  NewSoundChunk,
+	string(COMMONID):     NewCommonChunk,
+	string(SOUNDID):      NewSoundChunk,
+	string(NAMEID):       NewNameChunk,
+	string(AUTHORID):     NewAuthorChunk,
+	string(COPYRIGHTID):  NewCopyrightChunk,
+	string(ANNOTATIONID): NewAnnotationChunk,
 }
 
 // local chunks which are required in a valid AIFF file
@@ -25,7 +29,9 @@ var RequiredLocalChunkIDs = []utils.FourCC{
 }
 
 // chunks which are allowed to be present more than once
-var AllowedMultipleChunks = []utils.FourCC{}
+var AllowedMultipleChunks = []utils.FourCC{
+	ANNOTATIONID,
+}
 
 type FormChunk struct {
 	utils.Chunk
