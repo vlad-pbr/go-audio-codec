@@ -17,9 +17,23 @@ type TextChunk struct {
 	Text []byte
 }
 
-// TODO return proper chunk instead of generic TextChunk
+type NameChunk struct {
+	TextChunk
+}
 
-func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) (utils.ChunkInterface, error) {
+type AuthorChunk struct {
+	TextChunk
+}
+
+type CopyrightChunk struct {
+	TextChunk
+}
+
+type AnnotationChunk struct {
+	TextChunk
+}
+
+func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
 
 	// define chunk struct
 	var textChunk TextChunk
@@ -27,41 +41,25 @@ func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) (utils.ChunkInterfa
 	textChunk.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
 	textChunk.Text = buffer.Next(int(textChunk.ChunkSize))
 
-	return textChunk, nil
+	return textChunk
 }
 
 func (c TextChunk) GetBytes() []byte {
 	return c.GetBytesWithHeaders(c.Text)
 }
 
-type NameChunk struct {
-	TextChunk
-}
-
 func NewNameChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return NewTextChunk(buffer, NAMEID)
-}
-
-type AuthorChunk struct {
-	TextChunk
+	return NameChunk{NewTextChunk(buffer, NAMEID)}, nil
 }
 
 func NewAuthorChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return NewTextChunk(buffer, AUTHORID)
-}
-
-type CopyrightChunk struct {
-	TextChunk
+	return AuthorChunk{NewTextChunk(buffer, AUTHORID)}, nil
 }
 
 func NewCopyrightChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return NewTextChunk(buffer, COPYRIGHTID)
-}
-
-type AnnotationChunk struct {
-	TextChunk
+	return CopyrightChunk{NewTextChunk(buffer, COPYRIGHTID)}, nil
 }
 
 func NewAnnotationChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return NewTextChunk(buffer, ANNOTATIONID)
+	return AnnotationChunk{NewTextChunk(buffer, ANNOTATIONID)}, nil
 }
