@@ -13,13 +13,13 @@ var SOUNDID utils.FourCC = []byte("SSND")
 
 type SoundDataChunk struct {
 	utils.Chunk
-	offset    uint32
-	blockSize uint32
-	soundData []uint8
+	Offset    uint32
+	BlockSize uint32
+	SoundData []uint8
 }
 
 func (c SoundDataChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(c.offset, c.blockSize, c.soundData)
+	return c.GetBytesWithHeaders(c.Offset, c.BlockSize, c.SoundData)
 }
 
 func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
@@ -28,8 +28,8 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	var soundChunk SoundDataChunk
 	soundChunk.ChunkID = SOUNDID
 	soundChunk.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
-	soundChunk.offset = binary.BigEndian.Uint32(buffer.Next(4))
-	soundChunk.blockSize = binary.BigEndian.Uint32(buffer.Next(4))
+	soundChunk.Offset = binary.BigEndian.Uint32(buffer.Next(4))
+	soundChunk.BlockSize = binary.BigEndian.Uint32(buffer.Next(4))
 
 	// parse sound chunk samples
 	for i := 8; i != int(soundChunk.ChunkSize); i++ {
@@ -37,7 +37,7 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 		if err != nil {
 			return SoundDataChunk{}, errors.New(fmt.Sprintf("unexpected EOF while reading SOUND chunk samples"))
 		}
-		soundChunk.soundData = append(soundChunk.soundData, uint8(sample))
+		soundChunk.SoundData = append(soundChunk.SoundData, uint8(sample))
 	}
 
 	return soundChunk, nil

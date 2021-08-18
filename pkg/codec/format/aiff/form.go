@@ -35,8 +35,8 @@ var AllowedMultipleChunks = []utils.FourCC{
 
 type FormChunk struct {
 	utils.Chunk
-	formType    utils.FourCC // must be AIFF
-	localChunks []utils.ChunkInterface
+	FormType    utils.FourCC // must be AIFF
+	LocalChunks []utils.ChunkInterface
 }
 
 func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
@@ -53,9 +53,9 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 	form.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
 
 	// parse form chunk ID
-	form.formType = buffer.Next(4)
-	if bytes.Compare(form.formType, FORMTYPE) != 0 {
-		return FormChunk{}, errors.New(fmt.Sprintf("FORM chunk type is invalid: found %s, must be %s", form.formType, FORMTYPE))
+	form.FormType = buffer.Next(4)
+	if bytes.Compare(form.FormType, FORMTYPE) != 0 {
+		return FormChunk{}, errors.New(fmt.Sprintf("FORM chunk type is invalid: found %s, must be %s", form.FormType, FORMTYPE))
 	}
 
 	// the following chunks can be present
@@ -87,14 +87,14 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 		}
 
 		// append resulting local chunk
-		form.localChunks = append(form.localChunks, chunk)
+		form.LocalChunks = append(form.LocalChunks, chunk)
 
 		// indicate found local chunk
 		presentChunks[string(chunkID)] = true
 
 		// sound data chunk is not required if numSampleFrames is zero
 		if bytes.Compare(chunkID, COMMONID) == 0 {
-			if chunk.(CommonChunk).numSampleFrames == 0 {
+			if chunk.(CommonChunk).NumSampleFrames == 0 {
 				presentChunks[string(SOUNDID)] = true
 			}
 		}

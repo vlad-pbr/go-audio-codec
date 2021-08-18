@@ -7,6 +7,18 @@ import (
 )
 
 type AIFFFormat struct {
+	FormChunk FormChunk
+}
+
+func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
+
+	// create form chunk
+	formChunk, err := NewFormChunk(buffer)
+	if err != nil {
+		return AIFFFormat{}, err
+	}
+
+	return AIFFFormat{FormChunk: formChunk}, nil
 }
 
 // TODO multichannel table
@@ -15,8 +27,8 @@ type AIFFFormat struct {
 
 func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 
-	// create form chunk
-	formChunk, err := NewFormChunk(bytes.NewBuffer(data))
+	// create new AIFF format
+	aiffFormat, err := NewAIFFFormat(bytes.NewBuffer(data))
 	if err != nil {
 		return audio.Audio{}, err
 	}
@@ -25,9 +37,9 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	audio := audio.Audio{}
 
 	// iterate form local chunks and fill audio struct accordingly
-	for _, chunk := range formChunk.localChunks {
+	for _, chunk := range aiffFormat.FormChunk.LocalChunks {
 		if bytes.Compare(chunk.GetID(), COMMONID) == 0 {
-			audio.NumChannels = uint16(chunk.(CommonChunk).numChannels)
+			audio.NumChannels = uint16(chunk.(CommonChunk).NumChannels)
 		}
 	}
 

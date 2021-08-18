@@ -16,14 +16,14 @@ type extended []byte
 
 type CommonChunk struct {
 	utils.Chunk
-	numChannels     int16
-	numSampleFrames uint32
-	sampleSize      int16
-	sampleRate      extended
+	NumChannels     int16
+	NumSampleFrames uint32
+	SampleSize      int16
+	SampleRate      extended
 }
 
 func (c CommonChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(c.numChannels, c.numSampleFrames, c.sampleSize, c.sampleRate)
+	return c.GetBytesWithHeaders(c.NumChannels, c.NumSampleFrames, c.SampleSize, c.SampleRate)
 }
 
 func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
@@ -39,10 +39,10 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	}
 
 	// fill common chunk struct
-	commChunk.numChannels = int16(binary.BigEndian.Uint16(buffer.Next(2)))
-	commChunk.numSampleFrames = binary.BigEndian.Uint32(buffer.Next(4))
-	commChunk.sampleSize = int16(binary.BigEndian.Uint16(buffer.Next(2)))
-	commChunk.sampleRate = buffer.Next(10)
+	commChunk.NumChannels = int16(binary.BigEndian.Uint16(buffer.Next(2)))
+	commChunk.NumSampleFrames = binary.BigEndian.Uint32(buffer.Next(4))
+	commChunk.SampleSize = int16(binary.BigEndian.Uint16(buffer.Next(2)))
+	commChunk.SampleRate = buffer.Next(10)
 
 	return commChunk, nil
 }
