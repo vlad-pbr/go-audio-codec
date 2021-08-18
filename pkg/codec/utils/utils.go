@@ -58,3 +58,8 @@ func ContainsFourCC(slice []FourCC, fourCC FourCC) bool {
 
 	return false
 }
+
+// TODO implement
+func GetChunksBytes(chunks []ChunkInterface) []byte {
+	return []byte("")
+}

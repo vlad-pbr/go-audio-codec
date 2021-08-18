@@ -33,6 +33,10 @@ type AnnotationChunk struct {
 	TextChunk
 }
 
+func (c TextChunk) GetBytes() []byte {
+	return c.GetBytesWithHeaders(c.Text)
+}
+
 func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
 
 	// define chunk struct
@@ -42,10 +46,6 @@ func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
 	textChunk.Text = buffer.Next(int(textChunk.ChunkSize))
 
 	return textChunk
-}
-
-func (c TextChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(c.Text)
 }
 
 func NewNameChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {

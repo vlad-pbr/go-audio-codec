@@ -45,3 +45,8 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 
 	return audio, nil
 }
+
+// TODO implement
+func (f AIFFFormat) Encode(audio.Audio) []byte {
+	return []byte("")
+}

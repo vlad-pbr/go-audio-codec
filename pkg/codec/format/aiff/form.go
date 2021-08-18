@@ -39,6 +39,10 @@ type FormChunk struct {
 	LocalChunks []utils.ChunkInterface
 }
 
+func (c FormChunk) GetBytes() []byte {
+	return c.GetBytesWithHeaders(c.FormType, utils.GetChunksBytes(c.LocalChunks))
+}
+
 func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 
 	var form FormChunk

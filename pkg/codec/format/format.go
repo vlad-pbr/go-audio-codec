@@ -8,7 +8,7 @@ import (
 
 type Format interface {
 	Decode(data []byte) (audio.Audio, error)
-	// Encode(audio audio.Audio) []byte
+	Encode(audio audio.Audio) []byte
 }
 
 type FormatIdentifier int

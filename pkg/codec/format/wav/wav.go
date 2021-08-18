@@ -32,3 +32,8 @@ type dataChunk struct {
 func (f WAVFormat) Decode(bytes []byte) (audio.Audio, error) {
 	return audio.Audio{}, nil
 }
+
+// TODO implement
+func (f WAVFormat) Encode(audio audio.Audio) []byte {
+	return []byte("")
+}
