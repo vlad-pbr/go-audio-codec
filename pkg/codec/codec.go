@@ -8,3 +8,7 @@ import (
 func Decode(data []byte, identifier format.FormatIdentifier) (audio.Audio, error) {
 	return format.IdentifierToFormat[identifier].Decode(data)
 }
+
+func Encode(audio audio.Audio, identifier format.FormatIdentifier) []byte {
+	return format.IdentifierToFormat[identifier].Encode(audio)
+}
