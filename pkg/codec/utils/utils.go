@@ -14,7 +14,7 @@ type Chunk struct {
 }
 
 func (c Chunk) GetBytesWithID(fields ...interface{}) []byte {
-	return append(GetBytes(c.ChunkID), GetBytes(fields...)...)
+	return append(GetBytes(false, c.ChunkID), GetBytes(false, fields...)...)
 }
 
 type ChunkInterface interface {
@@ -27,7 +27,7 @@ func (c Chunk) GetID() FourCC {
 	return c.ChunkID
 }
 
-func GetBytes(fields ...interface{}) []byte {
+func GetBytes(zeroPad bool, fields ...interface{}) []byte {
 
 	var output []byte
 	var buffer bytes.Buffer
@@ -41,6 +41,11 @@ func GetBytes(fields ...interface{}) []byte {
 		}
 
 		output = append(output, buffer.Bytes()...)
+	}
+
+	// zero pad odd output if specified
+	if zeroPad && len(output)%2 != 0 {
+		output = append(output, byte(0))
 	}
 
 	return output

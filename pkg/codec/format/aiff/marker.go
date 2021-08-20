@@ -22,11 +22,11 @@ type MarkerChunk struct {
 }
 
 func (c Marker) GetBytes() []byte {
-	return utils.GetBytes(c.MarkerID, c.Position, c.MarkerName)
+	return utils.GetBytes(false, c.MarkerID, c.Position, c.MarkerName)
 }
 
 func (c MarkerChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(c.NumMarkers, GetMarkersBytes(c.Markers))
+	return c.MakeChunkBytes(c.NumMarkers, GetMarkersBytes(c.Markers))
 }
 
 // TODO implement

@@ -17,8 +17,8 @@ type AIFFChunk struct {
 	// TODO data must be zero padded if odd
 }
 
-func (c AIFFChunk) GetBytesWithHeaders(fields ...interface{}) []byte {
-	return c.GetBytesWithID(c.ChunkSize, fields)
+func (c AIFFChunk) MakeChunkBytes(fields ...interface{}) []byte {
+	return c.GetBytesWithID(c.ChunkSize, utils.GetBytes(true, fields))
 }
 
 func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {

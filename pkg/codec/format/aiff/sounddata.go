@@ -19,7 +19,7 @@ type SoundDataChunk struct {
 }
 
 func (c SoundDataChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(c.Offset, c.BlockSize, c.SoundData)
+	return c.MakeChunkBytes(c.Offset, c.BlockSize, c.SoundData)
 }
 
 func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {

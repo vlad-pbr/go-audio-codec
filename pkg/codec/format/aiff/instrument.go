@@ -24,11 +24,11 @@ type InstrumentChunk struct { // size is always 20
 }
 
 func (l Loop) GetBytes() []byte {
-	return utils.GetBytes(l.PlayMode, l.BeginLoop, l.EndLoop)
+	return utils.GetBytes(false, l.PlayMode, l.BeginLoop, l.EndLoop)
 }
 
 func (c InstrumentChunk) GetBytes() []byte {
-	return c.GetBytesWithHeaders(
+	return c.MakeChunkBytes(
 		c.BaseNote,
 		c.Detune,
 		c.LowNote,
