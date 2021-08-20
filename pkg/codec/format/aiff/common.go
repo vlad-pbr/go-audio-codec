@@ -16,10 +16,10 @@ type extended []byte
 
 type CommonChunk struct {
 	AIFFChunk
-	NumChannels     int16
-	NumSampleFrames uint32
-	SampleSize      int16
-	SampleRate      extended
+	NumChannels     int16    // amount of audio channels
+	NumSampleFrames uint32   // sample frame consists of sample per numChannels (= amount of samples / numChannels)
+	SampleSize      int16    // NUMBER OF BITS for single audio sample (value can range from 1 to 32)
+	SampleRate      extended // SAMPLE FRAME (not samples themselves) played back / sec
 }
 
 func (c CommonChunk) GetBytes() []byte {

@@ -3,8 +3,6 @@ package aiff
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
-	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -15,7 +13,7 @@ type SoundDataChunk struct {
 	AIFFChunk
 	Offset    uint32
 	BlockSize uint32
-	SoundData []uint8
+	SoundData []byte // sample frame size is always a multiple of 8
 }
 
 func (c SoundDataChunk) GetBytes() []byte {
@@ -31,14 +29,9 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	soundChunk.Offset = binary.BigEndian.Uint32(buffer.Next(4))
 	soundChunk.BlockSize = binary.BigEndian.Uint32(buffer.Next(4))
 
-	// parse sound chunk samples
-	for i := 8; i != int(soundChunk.ChunkSize); i++ {
-		sample, err := buffer.ReadByte()
-		if err != nil {
-			return SoundDataChunk{}, errors.New(fmt.Sprintf("unexpected error while reading %s chunk samples: %s", string(SOUNDID), err.Error()))
-		}
-		soundChunk.SoundData = append(soundChunk.SoundData, uint8(sample))
-	}
+	// read samples from buffer
+	// actual semantics of these samples are only relevant when decoding to audio struct
+	soundChunk.SoundData = buffer.Next(int(soundChunk.ChunkSize) - 8)
 
 	AdjustForZeroPadding(soundChunk.ChunkSize, buffer)
 

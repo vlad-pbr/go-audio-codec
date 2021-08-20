@@ -54,15 +54,27 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 		return audio.Audio{}, errors.New(fmt.Sprintf("error occurred while decoding AIFF: %s", err.Error()))
 	}
 
-	// define audio struct
-	audio := audio.Audio{}
+	var commonChunkIndex int
+	var audioChunkIndex int
 
-	// TODO iterate form local chunks and fill audio struct accordingly
-	for _, chunk := range aiffFormat.FormChunk.LocalChunks {
-		if bytes.Compare(chunk.GetID(), COMMONID) == 0 {
-			audio.NumChannels = uint16(chunk.(CommonChunk).NumChannels)
+	// find required form local chunks
+	for index, chunk := range aiffFormat.FormChunk.LocalChunks {
+
+		switch string(chunk.GetID()) {
+		case string(COMMONID):
+			commonChunkIndex = index
+		case string(SOUNDID):
+			audioChunkIndex = index
+			_ = audioChunkIndex // TODO stub
 		}
 	}
+
+	// fill audio struct with metadata
+	audio := audio.Audio{
+		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
+	}
+
+	// TODO read sample data in soundchunk
 
 	return audio, nil
 }
