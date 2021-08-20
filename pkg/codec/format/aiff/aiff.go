@@ -13,8 +13,7 @@ type AIFFFormat struct {
 
 type AIFFChunk struct {
 	utils.Chunk
-	ChunkSize int32
-	// TODO data must be zero padded if odd
+	ChunkSize int32 // in size is odd - zero pad must be present
 }
 
 func (c AIFFChunk) MakeChunkBytes(fields ...interface{}) []byte {
@@ -30,6 +29,15 @@ func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
 	}
 
 	return AIFFFormat{FormChunk: formChunk}, nil
+}
+
+func AdjustForZeroPadding(size int32, buffer *bytes.Buffer) {
+
+	// drop zero pad byte if chunk size is odd
+	if size%2 != 0 {
+		buffer.Next(1)
+	}
+
 }
 
 // TODO multichannel table

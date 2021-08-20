@@ -40,5 +40,7 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 		soundChunk.SoundData = append(soundChunk.SoundData, uint8(sample))
 	}
 
+	AdjustForZeroPadding(soundChunk.ChunkSize, buffer)
+
 	return soundChunk, nil
 }

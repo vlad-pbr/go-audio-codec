@@ -45,6 +45,8 @@ func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
 	textChunk.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
 	textChunk.Text = buffer.Next(int(textChunk.ChunkSize))
 
+	AdjustForZeroPadding(textChunk.ChunkSize, buffer)
+
 	return textChunk
 }
 

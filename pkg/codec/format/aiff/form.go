@@ -68,8 +68,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 		presentChunks[fourCC] = false
 	}
 
-	// while unread portion of buffer is not empty
-	for buffer.Len() != 0 {
+	// read until end of buffer (account for zero padding)
+	for buffer.Len() > 1 {
 
 		chunkID := buffer.Next(4)
 
@@ -103,6 +103,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 			}
 		}
 	}
+
+	AdjustForZeroPadding(form.ChunkSize, buffer)
 
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {

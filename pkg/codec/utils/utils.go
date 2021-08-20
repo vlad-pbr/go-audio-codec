@@ -9,8 +9,6 @@ type FourCC []byte
 
 type Chunk struct {
 	ChunkID FourCC
-	// ChunkSize int32
-	// for AIFF, data must be zero padded if odd length
 }
 
 func (c Chunk) GetBytesWithID(fields ...interface{}) []byte {
@@ -19,7 +17,6 @@ func (c Chunk) GetBytesWithID(fields ...interface{}) []byte {
 
 type ChunkInterface interface {
 	GetID() FourCC
-	// GetSize() int32
 	GetBytes() []byte
 }
 
