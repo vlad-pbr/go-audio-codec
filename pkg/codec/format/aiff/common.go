@@ -35,7 +35,7 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 
 	// make sure common chunk size is 18
 	if commChunk.ChunkSize != 18 {
-		return CommonChunk{}, errors.New(fmt.Sprintf("COMMON chunk size is invalid: found %d, must be %d", commChunk.ChunkSize, 18))
+		return CommonChunk{}, errors.New(fmt.Sprintf("%s chunk size is invalid: found %d, must be %d", string(COMMONID), commChunk.ChunkSize, 18))
 	}
 
 	// fill common chunk struct

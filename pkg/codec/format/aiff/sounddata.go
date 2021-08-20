@@ -35,7 +35,7 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	for i := 8; i != int(soundChunk.ChunkSize); i++ {
 		sample, err := buffer.ReadByte()
 		if err != nil {
-			return SoundDataChunk{}, errors.New(fmt.Sprintf("unexpected EOF while reading SOUND chunk samples"))
+			return SoundDataChunk{}, errors.New(fmt.Sprintf("unexpected error while reading %s chunk samples: %s", string(SOUNDID), err.Error()))
 		}
 		soundChunk.SoundData = append(soundChunk.SoundData, uint8(sample))
 	}

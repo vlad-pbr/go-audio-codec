@@ -75,19 +75,19 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 
 		// make sure chunk not already present unless allowed to be present multiple times
 		if presentChunks[string(chunkID)] && !utils.ContainsFourCC(AllowedMultipleChunks, chunkID) {
-			return FormChunk{}, errors.New(fmt.Sprintf("more than one instance of %s chunk present", string(chunkID)))
+			return FormChunk{}, errors.New(fmt.Sprintf("more than one instance of %s local chunk present", string(chunkID)))
 		}
 
 		// retrieve target chunk's creation function
 		newChunkFunction := LocalChunks[string(chunkID)]
 		if newChunkFunction == nil {
-			return FormChunk{}, errors.New(fmt.Sprintf("invalid chunk ID found: %s", string(chunkID)))
+			return FormChunk{}, errors.New(fmt.Sprintf("invalid local chunk ID found: %s", string(chunkID)))
 		}
 
 		// create target chunk
 		chunk, err := newChunkFunction.(func(*bytes.Buffer) (utils.ChunkInterface, error))(buffer)
 		if err != nil {
-			return FormChunk{}, errors.New(fmt.Sprintf("error occurred while decoding %s chunk: %s", string(chunkID), err.Error()))
+			return FormChunk{}, errors.New(fmt.Sprintf("error occurred while decoding %s local chunk: %s", string(chunkID), err.Error()))
 		}
 
 		// append resulting local chunk
@@ -109,7 +109,7 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {
 		if !present && utils.ContainsFourCC(RequiredLocalChunkIDs, []byte(chunk)) {
-			return FormChunk{}, errors.New(fmt.Sprintf("%s chunk is not present", chunk))
+			return FormChunk{}, errors.New(fmt.Sprintf("%s local chunk is not present", chunk))
 		}
 	}
 
