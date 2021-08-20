@@ -15,7 +15,7 @@ var COMMONID utils.FourCC = []byte("COMM")
 type extended []byte
 
 type CommonChunk struct {
-	utils.Chunk
+	AIFFChunk
 	NumChannels     int16
 	NumSampleFrames uint32
 	SampleSize      int16

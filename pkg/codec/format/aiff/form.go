@@ -34,7 +34,7 @@ var AllowedMultipleChunks = []utils.FourCC{
 }
 
 type FormChunk struct {
-	utils.Chunk
+	AIFFChunk
 	FormType    utils.FourCC // must be AIFF
 	LocalChunks []utils.ChunkInterface
 }

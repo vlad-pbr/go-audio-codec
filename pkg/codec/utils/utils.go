@@ -8,26 +8,23 @@ import (
 type FourCC []byte
 
 type Chunk struct {
-	ChunkID   FourCC
-	ChunkSize int32
+	ChunkID FourCC
+	// ChunkSize int32
+	// for AIFF, data must be zero padded if odd length
 }
 
-func (c Chunk) GetBytesWithHeaders(fields ...interface{}) []byte {
-	return append(GetBytes(c.ChunkID, c.ChunkSize), GetBytes(fields...)...)
+func (c Chunk) GetBytesWithID(fields ...interface{}) []byte {
+	return append(GetBytes(c.ChunkID), GetBytes(fields...)...)
 }
 
 type ChunkInterface interface {
 	GetID() FourCC
-	GetSize() int32
+	// GetSize() int32
 	GetBytes() []byte
 }
 
 func (c Chunk) GetID() FourCC {
 	return c.ChunkID
-}
-
-func (c Chunk) GetSize() int32 {
-	return c.ChunkSize
 }
 
 func GetBytes(fields ...interface{}) []byte {

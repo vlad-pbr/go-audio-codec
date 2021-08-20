@@ -12,7 +12,7 @@ import (
 var SOUNDID utils.FourCC = []byte("SSND")
 
 type SoundDataChunk struct {
-	utils.Chunk
+	AIFFChunk
 	Offset    uint32
 	BlockSize uint32
 	SoundData []uint8

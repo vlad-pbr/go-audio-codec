@@ -16,7 +16,7 @@ type Marker struct {
 }
 
 type MarkerChunk struct {
-	utils.Chunk
+	AIFFChunk
 	NumMarkers uint16
 	Markers    []Marker
 }

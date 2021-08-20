@@ -13,7 +13,7 @@ var COPYRIGHTID utils.FourCC = []byte("(c) ")
 var ANNOTATIONID utils.FourCC = []byte("ANNO")
 
 type TextChunk struct {
-	utils.Chunk
+	AIFFChunk
 	Text []byte
 }
 

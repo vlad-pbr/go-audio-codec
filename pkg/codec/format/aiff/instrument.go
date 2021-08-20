@@ -11,7 +11,7 @@ type Loop struct {
 }
 
 type InstrumentChunk struct { // size is always 20
-	utils.Chunk
+	AIFFChunk
 	BaseNote     int8
 	Detune       int8
 	LowNote      int8
