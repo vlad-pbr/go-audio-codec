@@ -11,15 +11,12 @@ import (
 
 var COMMONID utils.FourCC = []byte("COMM")
 
-// TODO float80
-type extended []byte
-
 type CommonChunk struct {
 	AIFFChunk
 	NumChannels     int16    // amount of audio channels
 	NumSampleFrames uint32   // sample frame consists of sample per numChannels (= amount of samples / numChannels)
 	SampleSize      int16    // NUMBER OF BITS for single audio sample (value can range from 1 to 32)
-	SampleRate      extended // SAMPLE FRAME (not samples themselves) played back / sec
+	SampleRate      [10]byte // SAMPLE FRAME (not samples themselves) played back / sec
 }
 
 func (c CommonChunk) GetBytes() []byte {
@@ -42,7 +39,7 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	commChunk.NumChannels = int16(binary.BigEndian.Uint16(buffer.Next(2)))
 	commChunk.NumSampleFrames = binary.BigEndian.Uint32(buffer.Next(4))
 	commChunk.SampleSize = int16(binary.BigEndian.Uint16(buffer.Next(2)))
-	commChunk.SampleRate = buffer.Next(10)
+	copy(commChunk.SampleRate[:], buffer.Next(10))
 
 	return commChunk, nil
 }
