@@ -2,7 +2,6 @@ package aiff
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
@@ -27,7 +26,7 @@ func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
 	// create form chunk
 	formChunk, err := NewFormChunk(buffer)
 	if err != nil {
-		return AIFFFormat{}, errors.New(fmt.Sprintf("error occurred while decoding FORM chunk: %s", err.Error()))
+		return AIFFFormat{}, fmt.Errorf("error occurred while decoding FORM chunk: %s", err.Error())
 	}
 
 	return AIFFFormat{FormChunk: formChunk}, nil
@@ -51,7 +50,7 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	// create new AIFF format
 	aiffFormat, err := NewAIFFFormat(bytes.NewBuffer(data))
 	if err != nil {
-		return audio.Audio{}, errors.New(fmt.Sprintf("error occurred while decoding AIFF: %s", err.Error()))
+		return audio.Audio{}, fmt.Errorf("error occurred while decoding AIFF: %s", err.Error())
 	}
 
 	var commonChunkIndex int

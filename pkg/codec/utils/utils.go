@@ -50,7 +50,7 @@ func GetBytes(zeroPad bool, fields ...interface{}) []byte {
 
 func ContainsFourCC(slice []FourCC, fourCC FourCC) bool {
 	for _, item := range slice {
-		if bytes.Compare(item, fourCC) == 0 {
+		if bytes.Equal(item, fourCC) {
 			return true
 		}
 	}

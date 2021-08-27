@@ -3,7 +3,6 @@ package aiff
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
@@ -49,8 +48,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 
 	// parse form chunk ID
 	form.ChunkID = buffer.Next(4)
-	if bytes.Compare(form.ChunkID, FORMID) != 0 {
-		return FormChunk{}, errors.New(fmt.Sprintf("FORM chunk ID is invalid: found %s, must be %s", form.ChunkID, FORMID))
+	if !bytes.Equal(form.ChunkID, FORMID) {
+		return form, fmt.Errorf("FORM chunk ID is invalid: found %s, must be %s", form.ChunkID, FORMID)
 	}
 
 	// parse form chunk size
@@ -58,8 +57,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 
 	// parse form chunk ID
 	form.FormType = buffer.Next(4)
-	if bytes.Compare(form.FormType, FORMTYPE) != 0 {
-		return FormChunk{}, errors.New(fmt.Sprintf("FORM chunk type is invalid: found %s, must be %s", form.FormType, FORMTYPE))
+	if !bytes.Equal(form.FormType, FORMTYPE) {
+		return form, fmt.Errorf("FORM chunk type is invalid: found %s, must be %s", form.FormType, FORMTYPE)
 	}
 
 	// the following chunks can be present
@@ -75,19 +74,19 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 
 		// make sure chunk not already present unless allowed to be present multiple times
 		if presentChunks[string(chunkID)] && !utils.ContainsFourCC(AllowedMultipleChunks, chunkID) {
-			return FormChunk{}, errors.New(fmt.Sprintf("more than one instance of %s local chunk present", string(chunkID)))
+			return form, fmt.Errorf("more than one instance of %s local chunk present", string(chunkID))
 		}
 
 		// retrieve target chunk's creation function
 		newChunkFunction := LocalChunks[string(chunkID)]
 		if newChunkFunction == nil {
-			return FormChunk{}, errors.New(fmt.Sprintf("invalid local chunk ID found: %s", string(chunkID)))
+			return form, fmt.Errorf("invalid local chunk ID found: %s", string(chunkID))
 		}
 
 		// create target chunk
 		chunk, err := newChunkFunction.(func(*bytes.Buffer) (utils.ChunkInterface, error))(buffer)
 		if err != nil {
-			return FormChunk{}, errors.New(fmt.Sprintf("error occurred while decoding %s local chunk: %s", string(chunkID), err.Error()))
+			return form, fmt.Errorf("error occurred while decoding %s local chunk: %s", string(chunkID), err.Error())
 		}
 
 		// append resulting local chunk
@@ -97,7 +96,7 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 		presentChunks[string(chunkID)] = true
 
 		// sound data chunk is not required if numSampleFrames is zero
-		if bytes.Compare(chunkID, COMMONID) == 0 {
+		if bytes.Equal(chunkID, COMMONID) {
 			if chunk.(CommonChunk).NumSampleFrames == 0 {
 				presentChunks[string(SOUNDID)] = true
 			}
@@ -109,7 +108,7 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {
 		if !present && utils.ContainsFourCC(RequiredLocalChunkIDs, []byte(chunk)) {
-			return FormChunk{}, errors.New(fmt.Sprintf("%s local chunk is not present", chunk))
+			return form, fmt.Errorf("%s local chunk is not present", chunk)
 		}
 	}
 
