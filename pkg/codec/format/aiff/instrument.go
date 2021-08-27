@@ -1,6 +1,10 @@
 package aiff
 
-import "github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+import (
+	"bytes"
+
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+)
 
 var INSTRUMENTID utils.FourCC = [4]byte{73, 78, 83, 84} // INST
 
@@ -24,7 +28,12 @@ type InstrumentChunk struct { // size is always 20
 }
 
 func (l Loop) GetBytes() []byte {
-	return utils.GetBytes(false, l.PlayMode, l.BeginLoop, l.EndLoop)
+	return utils.GetBytes(
+		false,
+		l.PlayMode,
+		l.BeginLoop,
+		l.EndLoop,
+	)
 }
 
 func (c InstrumentChunk) GetBytes() []byte {
@@ -39,4 +48,9 @@ func (c InstrumentChunk) GetBytes() []byte {
 		c.SustainLoop.GetBytes(),
 		c.ReleaseLoop.GetBytes(),
 	)
+}
+
+// TODO implement
+func NewInstrumentChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
+	return InstrumentChunk{}, nil
 }

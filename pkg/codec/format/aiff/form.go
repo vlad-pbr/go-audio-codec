@@ -13,12 +13,18 @@ var FORMTYPE utils.FourCC = [4]byte{65, 73, 70, 70} // AIFF
 
 // possible local chunks, in order of precedence
 var LocalChunks = map[string]interface{}{
-	string(COMMONID[:]):     NewCommonChunk,
-	string(SOUNDID[:]):      NewSoundChunk,
-	string(NAMEID[:]):       NewNameChunk,
-	string(AUTHORID[:]):     NewAuthorChunk,
-	string(COPYRIGHTID[:]):  NewCopyrightChunk,
-	string(ANNOTATIONID[:]): NewAnnotationChunk,
+	string(COMMONID[:]):              NewCommonChunk,
+	string(SOUNDID[:]):               NewSoundChunk,
+	string(MARKERID[:]):              NewMarkerChunk,
+	string(INSTRUMENTID[:]):          NewInstrumentChunk,
+	string(COMMENTSID[:]):            NewCommentsChunk,
+	string(NAMEID[:]):                NewNameChunk,
+	string(AUTHORID[:]):              NewAuthorChunk,
+	string(COPYRIGHTID[:]):           NewCopyrightChunk,
+	string(ANNOTATIONID[:]):          NewAnnotationChunk,
+	string(AUDIORECORDINGID[:]):      NewAudioRecordingChunk,
+	string(MIDIDATAID[:]):            NewMIDIDataChunk,
+	string(APPLICATIONSPECIFICID[:]): NewApplicationSpecificChunk,
 }
 
 // local chunks which are required in a valid AIFF file
@@ -30,6 +36,8 @@ var RequiredLocalChunkIDs = []utils.FourCC{
 // chunks which are allowed to be present more than once
 var AllowedMultipleChunks = []utils.FourCC{
 	ANNOTATIONID,
+	MIDIDATAID,
+	APPLICATIONSPECIFICID,
 }
 
 type FormChunk struct {
@@ -39,7 +47,10 @@ type FormChunk struct {
 }
 
 func (c FormChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(c.FormType, utils.GetChunksBytes(c.LocalChunks))
+	return c.MakeChunkBytes(
+		c.FormType,
+		utils.GetChunksBytes(c.LocalChunks),
+	)
 }
 
 func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {

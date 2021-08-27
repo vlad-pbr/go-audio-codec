@@ -18,7 +18,10 @@ type AIFFChunk struct {
 }
 
 func (c AIFFChunk) MakeChunkBytes(fields ...interface{}) []byte {
-	return c.GetBytesWithID(c.ChunkSize, utils.GetBytes(true, fields))
+	return c.GetBytesWithID(
+		c.ChunkSize,
+		utils.GetBytes(true, fields),
+	)
 }
 
 func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {

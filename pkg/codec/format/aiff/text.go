@@ -34,7 +34,9 @@ type AnnotationChunk struct {
 }
 
 func (c TextChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(c.Text)
+	return c.MakeChunkBytes(
+		c.Text,
+	)
 }
 
 func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {

@@ -19,7 +19,12 @@ type CommonChunk struct {
 }
 
 func (c CommonChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(c.NumChannels, c.NumSampleFrames, c.SampleSize, c.SampleRate)
+	return c.MakeChunkBytes(
+		c.NumChannels,
+		c.NumSampleFrames,
+		c.SampleSize,
+		c.SampleRate,
+	)
 }
 
 func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {

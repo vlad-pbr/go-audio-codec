@@ -1,6 +1,10 @@
 package aiff
 
-import "github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+import (
+	"bytes"
+
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+)
 
 var MARKERID utils.FourCC = [4]byte{77, 65, 82, 75} // MARK
 
@@ -22,14 +26,27 @@ type MarkerChunk struct {
 }
 
 func (c Marker) GetBytes() []byte {
-	return utils.GetBytes(false, c.MarkerID, c.Position, c.MarkerName)
+	return utils.GetBytes(
+		false,
+		c.MarkerID,
+		c.Position,
+		c.MarkerName,
+	)
 }
 
 func (c MarkerChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(c.NumMarkers, GetMarkersBytes(c.Markers))
+	return c.MakeChunkBytes(
+		c.NumMarkers,
+		GetMarkersBytes(c.Markers),
+	)
 }
 
 // TODO implement
 func GetMarkersBytes(markers []Marker) []byte {
 	return []byte("")
+}
+
+// TODO implement
+func NewMarkerChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
+	return MarkerChunk{}, nil
 }
