@@ -8,7 +8,7 @@ import (
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
 
-var COMMONID utils.FourCC = []byte("COMM")
+var COMMONID utils.FourCC = [4]byte{67, 79, 77, 77} // COMM
 
 type CommonChunk struct {
 	AIFFChunk
@@ -31,7 +31,7 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 
 	// make sure common chunk size is 18
 	if commChunk.ChunkSize != 18 {
-		return commChunk, fmt.Errorf("%s chunk size is invalid: found %d, must be %d", string(COMMONID), commChunk.ChunkSize, 18)
+		return commChunk, fmt.Errorf("%s chunk size is invalid: found %d, must be %d", string(COMMONID[:]), commChunk.ChunkSize, 18)
 	}
 
 	// fill common chunk struct

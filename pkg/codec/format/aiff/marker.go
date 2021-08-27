@@ -2,7 +2,7 @@ package aiff
 
 import "github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 
-var MARKERID utils.FourCC = []byte("MARK")
+var MARKERID utils.FourCC = [4]byte{77, 65, 82, 75} // MARK
 
 // TODO pascal string
 type pstring []byte

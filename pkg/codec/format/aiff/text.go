@@ -7,10 +7,10 @@ import (
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
 
-var NAMEID utils.FourCC = []byte("NAME")
-var AUTHORID utils.FourCC = []byte("AUTH")
-var COPYRIGHTID utils.FourCC = []byte("(c) ")
-var ANNOTATIONID utils.FourCC = []byte("ANNO")
+var NAMEID utils.FourCC = [4]byte{78, 65, 77, 69}       // NAME
+var AUTHORID utils.FourCC = [4]byte{65, 85, 84, 72}     // AUTH
+var COPYRIGHTID utils.FourCC = [4]byte{40, 99, 41, 32}  // (c)
+var ANNOTATIONID utils.FourCC = [4]byte{65, 78, 78, 79} // ANNO
 
 type TextChunk struct {
 	AIFFChunk

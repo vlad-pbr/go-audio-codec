@@ -7,7 +7,7 @@ import (
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
 
-var SOUNDID utils.FourCC = []byte("SSND")
+var SOUNDID utils.FourCC = [4]byte{83, 83, 78, 68} // SSND
 
 type SoundDataChunk struct {
 	AIFFChunk

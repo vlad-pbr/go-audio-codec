@@ -2,7 +2,7 @@ package aiff
 
 import "github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 
-var INSTRUMENTID utils.FourCC = []byte("INST")
+var INSTRUMENTID utils.FourCC = [4]byte{73, 78, 83, 84} // INST
 
 type Loop struct {
 	PlayMode  int16

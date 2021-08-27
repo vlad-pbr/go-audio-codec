@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 )
 
-type FourCC []byte
+type FourCC [4]byte
 
 type Chunk struct {
 	ChunkID FourCC
@@ -50,7 +50,7 @@ func GetBytes(zeroPad bool, fields ...interface{}) []byte {
 
 func ContainsFourCC(slice []FourCC, fourCC FourCC) bool {
 	for _, item := range slice {
-		if bytes.Equal(item, fourCC) {
+		if bytes.Equal(item[:], fourCC[:]) {
 			return true
 		}
 	}

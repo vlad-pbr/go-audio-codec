@@ -59,10 +59,12 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	// find required form local chunks
 	for index, chunk := range aiffFormat.FormChunk.LocalChunks {
 
-		switch string(chunk.GetID()) {
-		case string(COMMONID):
+		chunkID := chunk.GetID()
+
+		switch string(chunkID[:]) {
+		case string(COMMONID[:]):
 			commonChunkIndex = index
-		case string(SOUNDID):
+		case string(SOUNDID[:]):
 			audioChunkIndex = index
 			_ = audioChunkIndex // TODO stub
 		}
