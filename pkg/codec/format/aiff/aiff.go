@@ -6,6 +6,7 @@ import (
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/float80"
 )
 
 type AIFFFormat struct {
@@ -76,6 +77,8 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	// fill audio struct with metadata
 	audio := audio.Audio{
 		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
+		BitDepth:    uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
+		SampleRate:  float80.NewFromBytes(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate).UInt64(),
 	}
 
 	// TODO read sample data in soundchunk
