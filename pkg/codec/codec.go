@@ -1,17 +1,23 @@
 package codec
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format"
 )
 
-func Decode(data []byte, identifier format.FormatIdentifier) (audio.Audio, error) {
+func Decode(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			e = fmt.Errorf("panic while decoding format: %s", r)
+		}
+	}()
+
 	aud, err := format.IdentifierToFormat[identifier].Decode(data)
 	if err != nil {
-		return audio.Audio{}, errors.New(fmt.Sprintf("decode error: %s", err.Error()))
+		return audio.Audio{}, fmt.Errorf("decode error: %s", err.Error())
 	}
 
 	return aud, nil

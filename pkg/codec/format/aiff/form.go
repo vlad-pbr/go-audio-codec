@@ -58,16 +58,16 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 	var form FormChunk
 
 	// parse form chunk ID
-	copy(form.ChunkID[:], buffer.Next(4))
+	copy(form.ChunkID[:], utils.Next(buffer, 4))
 	if !bytes.Equal(form.ChunkID[:], FORMID[:]) {
 		return form, fmt.Errorf("FORM chunk ID is invalid: found %s, must be %s", form.ChunkID, FORMID)
 	}
 
 	// parse form chunk size
-	form.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
+	form.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
 
 	// parse form chunk ID
-	copy(form.FormType[:], buffer.Next(4))
+	copy(form.FormType[:], utils.Next(buffer, 4))
 	if !bytes.Equal(form.FormType[:], FORMTYPE[:]) {
 		return form, fmt.Errorf("FORM chunk type is invalid: found %s, must be %s", form.FormType, FORMTYPE)
 	}
@@ -81,9 +81,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 	// read until end of buffer (account for zero padding)
 	for buffer.Len() > 1 {
 
-		// chunkID := buffer.Next(4)
 		var chunkID utils.FourCC
-		copy(chunkID[:], buffer.Next(4))
+		copy(chunkID[:], utils.Next(buffer, 4))
 
 		// make sure chunk not already present unless allowed to be present multiple times
 		if presentChunks[string(chunkID[:])] && !utils.ContainsFourCC(AllowedMultipleChunks, chunkID) {

@@ -39,7 +39,7 @@ func AdjustForZeroPadding(size int32, buffer *bytes.Buffer) {
 
 	// drop zero pad byte if chunk size is odd
 	if size%2 != 0 {
-		buffer.Next(1)
+		utils.Next(buffer, 1)
 	}
 
 }

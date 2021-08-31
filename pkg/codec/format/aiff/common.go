@@ -33,7 +33,7 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	// define common chunk struct
 	var commChunk CommonChunk
 	commChunk.ChunkID = COMMONID
-	commChunk.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
+	commChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
 
 	// make sure common chunk size is 18
 	if commChunk.ChunkSize != 18 {
@@ -41,13 +41,13 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	}
 
 	// fill common chunk struct
-	commChunk.NumChannels = int16(binary.BigEndian.Uint16(buffer.Next(2)))
-	commChunk.NumSampleFrames = binary.BigEndian.Uint32(buffer.Next(4))
-	commChunk.SampleSize = int16(binary.BigEndian.Uint16(buffer.Next(2)))
+	commChunk.NumChannels = int16(binary.BigEndian.Uint16(utils.Next(buffer, 2)))
+	commChunk.NumSampleFrames = binary.BigEndian.Uint32(utils.Next(buffer, 4))
+	commChunk.SampleSize = int16(binary.BigEndian.Uint16(utils.Next(buffer, 2)))
 
 	// fill sample rate
 	var sampleRateBytes [10]byte
-	copy(sampleRateBytes[:], buffer.Next(10))
+	copy(sampleRateBytes[:], utils.Next(buffer, 10))
 	commChunk.SampleRate = float80.NewFromBytes(sampleRateBytes)
 
 	return commChunk, nil

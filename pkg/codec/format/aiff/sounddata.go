@@ -29,13 +29,13 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	// fill common chunk struct
 	var soundChunk SoundDataChunk
 	soundChunk.ChunkID = SOUNDID
-	soundChunk.ChunkSize = int32(binary.BigEndian.Uint32(buffer.Next(4)))
-	soundChunk.Offset = binary.BigEndian.Uint32(buffer.Next(4))
-	soundChunk.BlockSize = binary.BigEndian.Uint32(buffer.Next(4))
+	soundChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	soundChunk.Offset = binary.BigEndian.Uint32(utils.Next(buffer, 4))
+	soundChunk.BlockSize = binary.BigEndian.Uint32(utils.Next(buffer, 4))
 
 	// read samples from buffer
 	// actual semantics of these samples are only relevant when decoding to audio struct
-	soundChunk.SoundData = buffer.Next(int(soundChunk.ChunkSize) - 8)
+	soundChunk.SoundData = utils.Next(buffer, int(soundChunk.ChunkSize)-8)
 
 	AdjustForZeroPadding(soundChunk.ChunkSize, buffer)
 

@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 )
 
 type FourCC [4]byte
@@ -61,4 +62,14 @@ func ContainsFourCC(slice []FourCC, fourCC FourCC) bool {
 // TODO implement
 func GetChunksBytes(chunks []ChunkInterface) []byte {
 	return []byte("")
+}
+
+// panicing version of buffer.Next
+func Next(buffer *bytes.Buffer, amount int) []byte {
+
+	if buffer.Len() < amount {
+		panic(fmt.Sprintf("unexpected EOF: tried to read %d bytes when only %d left in buffer", amount, buffer.Len()))
+	}
+
+	return buffer.Next(amount)
 }
