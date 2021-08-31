@@ -13,7 +13,7 @@ type Float80 struct {
 	Mantissa uint64
 }
 
-func (f Float80) UInt64() uint64 {
+func (f Float80) Float() *big.Float {
 
 	// take exponent, strip sign bit, deduct bias
 	exp := (f.Exponent & 32767) - BIAS
@@ -26,10 +26,7 @@ func (f Float80) UInt64() uint64 {
 		}
 	}
 
-	// convert to uint64
-	ans, _ := big.NewFloat(0).SetPrec(64).SetMantExp(mantissaFloat, int(exp)).Uint64()
-
-	return ans
+	return big.NewFloat(0).SetPrec(64).SetMantExp(mantissaFloat, int(exp))
 }
 
 // TODO implement
@@ -38,7 +35,7 @@ func (f Float80) Bytes() []byte {
 }
 
 // TODO implement
-func NewFromUInt64(value uint64) Float80 {
+func NewFromFloat(value *big.Float) Float80 {
 	return Float80{}
 }
 

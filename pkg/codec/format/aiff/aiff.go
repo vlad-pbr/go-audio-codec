@@ -74,11 +74,14 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 		}
 	}
 
+	// calculate samplerate from extended precision float bytes
+	sampleRate, _ := float80.NewFromBytes(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate).Float().Uint64()
+
 	// fill audio struct with metadata
 	audio := audio.Audio{
 		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
 		BitDepth:    uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
-		SampleRate:  float80.NewFromBytes(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate).UInt64(),
+		SampleRate:  sampleRate,
 	}
 
 	// TODO read sample data in soundchunk
