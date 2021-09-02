@@ -89,3 +89,11 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 func (f AIFFFormat) Encode(audio.Audio) []byte {
 	return []byte("")
 }
+
+func (f AIFFFormat) IsFormat(data []byte) bool {
+
+	// make sure headers match FORM AIFF format
+	_, _, _, err := FormHeaders(bytes.NewBuffer(data))
+	return err == nil
+
+}

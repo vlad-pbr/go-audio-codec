@@ -53,23 +53,39 @@ func (c FormChunk) GetBytes() []byte {
 	)
 }
 
-func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
+func FormHeaders(buffer *bytes.Buffer) (utils.FourCC, int32, utils.FourCC, error) {
 
-	var form FormChunk
+	var chunkID utils.FourCC
+	var chunkSize int32
+	var formType utils.FourCC
 
 	// parse form chunk ID
-	copy(form.ChunkID[:], utils.Next(buffer, 4))
-	if !bytes.Equal(form.ChunkID[:], FORMID[:]) {
-		return form, fmt.Errorf("FORM chunk ID is invalid: found %s, must be %s", form.ChunkID, FORMID)
+	copy(chunkID[:], utils.Next(buffer, 4))
+	if !bytes.Equal(chunkID[:], FORMID[:]) {
+		return chunkID, chunkSize, formType, fmt.Errorf("FORM chunk ID is invalid: found %s, must be %s", chunkID, FORMID)
 	}
 
 	// parse form chunk size
-	form.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	chunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
 
-	// parse form chunk ID
-	copy(form.FormType[:], utils.Next(buffer, 4))
-	if !bytes.Equal(form.FormType[:], FORMTYPE[:]) {
-		return form, fmt.Errorf("FORM chunk type is invalid: found %s, must be %s", form.FormType, FORMTYPE)
+	// parse form type
+	copy(formType[:], utils.Next(buffer, 4))
+	if !bytes.Equal(formType[:], FORMTYPE[:]) {
+		return chunkID, chunkSize, formType, fmt.Errorf("FORM chunk type is invalid: found %s, must be %s", formType, FORMTYPE)
+	}
+
+	return chunkID, chunkSize, formType, nil
+}
+
+func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
+
+	var form FormChunk
+	var err error
+
+	// parse form chunk headers
+	form.ChunkID, form.ChunkSize, form.FormType, err = FormHeaders(buffer)
+	if err != nil {
+		return form, fmt.Errorf("error while decoding FORM chunk headers: %s", err.Error())
 	}
 
 	// the following chunks can be present

@@ -37,3 +37,8 @@ func (f WAVFormat) Decode(bytes []byte) (audio.Audio, error) {
 func (f WAVFormat) Encode(audio audio.Audio) []byte {
 	return []byte("")
 }
+
+// TODO implement
+func (f WAVFormat) IsFormat(data []byte) bool {
+	return false
+}
