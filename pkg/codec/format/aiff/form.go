@@ -115,7 +115,7 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 		}
 	}
 
-	AdjustForZeroPadding(form.ChunkSize, buffer)
+	adjustForZeroPadding(form.ChunkSize, buffer)
 
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {

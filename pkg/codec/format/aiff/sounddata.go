@@ -37,7 +37,7 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	// actual semantics of these samples are only relevant when decoding to audio struct
 	soundChunk.SoundData = utils.Next(buffer, int(soundChunk.ChunkSize)-8)
 
-	AdjustForZeroPadding(soundChunk.ChunkSize, buffer)
+	adjustForZeroPadding(soundChunk.ChunkSize, buffer)
 
 	return soundChunk, nil
 }

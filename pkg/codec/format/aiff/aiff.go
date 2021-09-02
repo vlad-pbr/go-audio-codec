@@ -35,7 +35,7 @@ func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
 	return AIFFFormat{FormChunk: formChunk}, nil
 }
 
-func AdjustForZeroPadding(size int32, buffer *bytes.Buffer) {
+func adjustForZeroPadding(size int32, buffer *bytes.Buffer) {
 
 	// drop zero pad byte if chunk size is odd
 	if size%2 != 0 {
@@ -43,10 +43,6 @@ func AdjustForZeroPadding(size int32, buffer *bytes.Buffer) {
 	}
 
 }
-
-// TODO multichannel table
-
-// TODO optional chunks
 
 func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 
@@ -57,7 +53,7 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	}
 
 	var commonChunkIndex int
-	var audioChunkIndex int
+	var soundChunkIndex int
 
 	// find required form local chunks
 	for index, chunk := range aiffFormat.FormChunk.LocalChunks {
@@ -68,8 +64,7 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 		case string(COMMONID[:]):
 			commonChunkIndex = index
 		case string(SOUNDID[:]):
-			audioChunkIndex = index
-			_ = audioChunkIndex // TODO stub
+			soundChunkIndex = index
 		}
 	}
 
@@ -79,8 +74,10 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	// fill audio struct with metadata
 	audio := audio.Audio{
 		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
+		NumSamples:  uint64(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumSampleFrames),
 		BitDepth:    uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
 		SampleRate:  sampleRate,
+		Samples:     aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData,
 	}
 
 	// TODO read sample data in soundchunk
