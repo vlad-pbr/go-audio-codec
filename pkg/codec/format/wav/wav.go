@@ -1,36 +1,59 @@
 package wav
 
-import "github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
+import (
+	"bytes"
+	"fmt"
+
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+)
 
 type WAVFormat struct {
+	RIFFChunk RIFFChunk
 }
 
-type riffChunk struct {
-	chunkID   [4]byte // Chunk ID (should be 'RIFF')
-	chunkSize uint32  // File size - 8 (without Group ID and RIFF type)
-	format    [4]byte // Extension of a RIFF file (should be 'WAVE')
+type WAVChunk struct {
+	utils.Chunk
+	ChunkSize uint32
 }
 
-type formatChunk struct {
-	chunkID       [4]byte // Chunk ID (should be 'fmt ')
-	chunkSize     uint32  // Size of the rest of the chunk which follows this number
-	audioFormat   uint16  // Sample format (should be 1 for 'PCM')
-	numChannels   uint16  // Amount of audio channels present
-	sampleRate    uint32  // Amount of samples per second of audio
-	byteRate      uint32  // Amount of bytes per second of audio
-	blockAlign    uint16  // Number of audio channels * Bits per Sample / 8
-	bitsPerSample uint16  // Amount of bits per audio sample (bit depth)
+func NewWAVFormat(buffer *bytes.Buffer) (WAVFormat, error) {
+
+	// create riff chunk
+	riffChunk, err := NewRIFFChunk(buffer)
+	if err != nil {
+		return WAVFormat{}, fmt.Errorf("error occurred while decoding RIFF chunk: %s", err.Error())
+	}
+
+	return WAVFormat{RIFFChunk: riffChunk}, nil
 }
 
-type dataChunk struct {
-	chunkID   [4]byte // Chunk ID (should be 'data')
-	chunkSize uint32  // Number of bytes in the sample data portion
-	data      []byte  // Array of audio samples
+func (c WAVChunk) MakeChunkBytes(fields ...interface{}) []byte {
+	return c.GetBytesWithID(
+		c.ChunkSize,
+		utils.GetBytes(true, fields),
+	)
 }
 
 // TODO implement
-func (f WAVFormat) Decode(bytes []byte) (audio.Audio, error) {
-	return audio.Audio{}, nil
+func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
+
+	// create new WAVE format
+	waveFormat, err := NewWAVFormat(bytes.NewBuffer(data))
+	if err != nil {
+		return audio.Audio{}, fmt.Errorf("error occurred while decoding AIFF: %s", err.Error())
+	}
+
+	// fill audio struct with metadata
+	audio := audio.Audio{
+		NumChannels: waveFormat.RIFFChunk.FormatChunk.NumChannels,
+		NumSamples:  0, // TODO
+		BitDepth:    waveFormat.RIFFChunk.FormatChunk.BitsPerSample,
+		SampleRate:  uint64(waveFormat.RIFFChunk.FormatChunk.SampleRate),
+		Samples:     []byte(""), // TODO
+	}
+
+	return audio, nil
 }
 
 // TODO implement
@@ -38,7 +61,10 @@ func (f WAVFormat) Encode(audio audio.Audio) []byte {
 	return []byte("")
 }
 
-// TODO implement
 func (f WAVFormat) IsFormat(data []byte) bool {
-	return false
+
+	// make sure headers match RIFF WAVE format
+	_, _, _, err := RIFFHeaders(bytes.NewBuffer(data))
+	return err == nil
+
 }
