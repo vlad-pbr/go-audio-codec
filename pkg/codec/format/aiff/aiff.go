@@ -74,13 +74,10 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 	// fill audio struct with metadata
 	audio := audio.Audio{
 		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
-		NumSamples:  uint64(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumSampleFrames),
 		BitDepth:    uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
 		SampleRate:  sampleRate,
 		Samples:     aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData,
 	}
-
-	// TODO read sample data in soundchunk
 
 	return audio, nil
 }

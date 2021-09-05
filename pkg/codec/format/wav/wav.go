@@ -31,26 +31,24 @@ func NewWAVFormat(buffer *bytes.Buffer) (WAVFormat, error) {
 func (c WAVChunk) MakeChunkBytes(fields ...interface{}) []byte {
 	return c.GetBytesWithID(
 		c.ChunkSize,
-		utils.GetBytes(true, fields),
+		utils.GetBytes(false, fields),
 	)
 }
 
-// TODO implement
 func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
 
 	// create new WAVE format
 	waveFormat, err := NewWAVFormat(bytes.NewBuffer(data))
 	if err != nil {
-		return audio.Audio{}, fmt.Errorf("error occurred while decoding AIFF: %s", err.Error())
+		return audio.Audio{}, fmt.Errorf("error occurred while decoding WAV: %s", err.Error())
 	}
 
 	// fill audio struct with metadata
 	audio := audio.Audio{
 		NumChannels: waveFormat.RIFFChunk.FormatChunk.NumChannels,
-		NumSamples:  0, // TODO
 		BitDepth:    waveFormat.RIFFChunk.FormatChunk.BitsPerSample,
 		SampleRate:  uint64(waveFormat.RIFFChunk.FormatChunk.SampleRate),
-		Samples:     []byte(""), // TODO
+		Samples:     waveFormat.RIFFChunk.DataChunk.Data,
 	}
 
 	return audio, nil
