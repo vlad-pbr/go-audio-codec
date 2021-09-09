@@ -1,6 +1,7 @@
 package codec
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
@@ -15,7 +16,7 @@ func Decode(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e e
 		}
 	}()
 
-	aud, err := format.IdentifierToFormat[identifier].Decode(data)
+	aud, err := format.IdentifierToFormat[identifier].Decode(bytes.NewBuffer(data))
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("decode error: %s", err.Error())
 	}
@@ -24,5 +25,7 @@ func Decode(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e e
 }
 
 func Encode(audio audio.Audio, identifier format.FormatIdentifier) []byte {
-	return format.IdentifierToFormat[identifier].Encode(audio)
+	buffer := new(bytes.Buffer)
+	format.IdentifierToFormat[identifier].Encode(audio, buffer)
+	return buffer.Bytes()
 }

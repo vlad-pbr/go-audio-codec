@@ -34,10 +34,10 @@ func (c WAVChunk) ReadHeaders(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.LittleEndian, c.ChunkSize)
 }
 
-func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
+func (f WAVFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
 	// create new WAVE format
-	waveFormat, err := NewWAVFormat(bytes.NewBuffer(data))
+	waveFormat, err := NewWAVFormat(data)
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("error occurred while decoding WAV: %s", err.Error())
 	}
@@ -52,9 +52,7 @@ func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
 	)
 }
 
-func (f WAVFormat) Encode(audio audio.Audio) []byte {
-
-	buffer := new(bytes.Buffer)
+func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 
 	RIFFChunk{
 		WAVChunk: WAVChunk{
@@ -88,8 +86,6 @@ func (f WAVFormat) Encode(audio audio.Audio) []byte {
 			Data: audio.GetSamples(binary.LittleEndian),
 		},
 	}.Write(buffer)
-
-	return buffer.Bytes()
 }
 
 func (f WAVFormat) IsFormat(data []byte) bool {

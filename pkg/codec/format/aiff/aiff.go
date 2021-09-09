@@ -44,10 +44,10 @@ func adjustForZeroPadding(size int32, buffer *bytes.Buffer) {
 
 }
 
-func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
+func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
 	// create new AIFF format
-	aiffFormat, err := NewAIFFFormat(bytes.NewBuffer(data))
+	aiffFormat, err := NewAIFFFormat(data)
 	if err != nil {
 		return audio.Audio{}, fmt.Errorf("error occurred while decoding AIFF: %s", err.Error())
 	}
@@ -83,8 +83,7 @@ func (f AIFFFormat) Decode(data []byte) (audio.Audio, error) {
 }
 
 // TODO implement
-func (f AIFFFormat) Encode(audio.Audio) []byte {
-	return []byte("")
+func (f AIFFFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 }
 
 func (f AIFFFormat) IsFormat(data []byte) bool {

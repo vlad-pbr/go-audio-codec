@@ -1,14 +1,16 @@
 package format
 
 import (
+	"bytes"
+
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format/aiff"
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format/wav"
 )
 
 type Format interface {
-	Decode(data []byte) (audio.Audio, error)
-	Encode(audio audio.Audio) []byte
+	Decode(data *bytes.Buffer) (audio.Audio, error)
+	Encode(audio audio.Audio, buffer *bytes.Buffer)
 	IsFormat(data []byte) bool
 }
 
