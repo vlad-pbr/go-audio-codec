@@ -42,15 +42,14 @@ func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
 		return audio.Audio{}, fmt.Errorf("error occurred while decoding WAV: %s", err.Error())
 	}
 
-	// fill audio struct with metadata
-	audio := audio.Audio{
-		NumChannels: waveFormat.RIFFChunk.FormatChunk.NumChannels,
-		BitDepth:    waveFormat.RIFFChunk.FormatChunk.BitsPerSample,
-		SampleRate:  uint64(waveFormat.RIFFChunk.FormatChunk.SampleRate),
-		Samples:     waveFormat.RIFFChunk.DataChunk.Data,
-	}
-
-	return audio, nil
+	// audio container out of wave format
+	return audio.NewAudio(
+		waveFormat.RIFFChunk.FormatChunk.NumChannels,
+		uint64(waveFormat.RIFFChunk.FormatChunk.SampleRate),
+		waveFormat.RIFFChunk.FormatChunk.BitsPerSample,
+		waveFormat.RIFFChunk.DataChunk.Data,
+		binary.LittleEndian,
+	)
 }
 
 func (f WAVFormat) Encode(audio audio.Audio) []byte {
@@ -86,7 +85,7 @@ func (f WAVFormat) Encode(audio audio.Audio) []byte {
 				},
 				ChunkSize: uint32(len(audio.Samples)),
 			},
-			Data: audio.Samples,
+			Data: audio.GetSamples(binary.LittleEndian),
 		},
 	}.Write(buffer)
 
