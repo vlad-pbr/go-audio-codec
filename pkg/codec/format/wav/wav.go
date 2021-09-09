@@ -59,7 +59,7 @@ func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 			Chunk: utils.Chunk{
 				ChunkID: RIFFID,
 			},
-			ChunkSize: 36 + uint32(audio.SamplesLength()),
+			ChunkSize: 36 + uint32(audio.ByteLength()),
 		},
 		Format: WAVEID,
 		FormatChunk: FormatChunk{
@@ -81,7 +81,7 @@ func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 				Chunk: utils.Chunk{
 					ChunkID: DATAID,
 				},
-				ChunkSize: uint32(audio.SamplesLength()),
+				ChunkSize: uint32(audio.ByteLength()),
 			},
 			Data: audio.Samples(binary.LittleEndian),
 		},
