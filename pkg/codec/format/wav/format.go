@@ -20,15 +20,16 @@ type FormatChunk struct {
 	BitsPerSample uint16 // sample size in BITS (bit depth)
 }
 
-func (c FormatChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.AudioFormat,
-		c.NumChannels,
-		c.SampleRate,
-		c.ByteRate,
-		c.BlockAlign,
-		c.BitsPerSample,
-	)
+func (c FormatChunk) Write(buffer *bytes.Buffer) {
+
+	c.ReadHeaders(buffer)
+	binary.Write(buffer, binary.LittleEndian, c.AudioFormat)
+	binary.Write(buffer, binary.LittleEndian, c.NumChannels)
+	binary.Write(buffer, binary.LittleEndian, c.SampleRate)
+	binary.Write(buffer, binary.LittleEndian, c.ByteRate)
+	binary.Write(buffer, binary.LittleEndian, c.BlockAlign)
+	binary.Write(buffer, binary.LittleEndian, c.BitsPerSample)
+
 }
 
 func NewFormatChunk(buffer *bytes.Buffer) (FormatChunk, error) {

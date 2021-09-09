@@ -8,6 +8,10 @@ import (
 
 type FourCC [4]byte
 
+func (f FourCC) GetBytes() []byte {
+	return f[:]
+}
+
 type Chunk struct {
 	ChunkID FourCC
 }

@@ -2,6 +2,7 @@ package wav
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
@@ -28,11 +29,9 @@ func NewWAVFormat(buffer *bytes.Buffer) (WAVFormat, error) {
 	return WAVFormat{RIFFChunk: riffChunk}, nil
 }
 
-func (c WAVChunk) MakeChunkBytes(fields ...interface{}) []byte {
-	return c.GetBytesWithID(
-		c.ChunkSize,
-		utils.GetBytes(false, fields),
-	)
+func (c WAVChunk) ReadHeaders(buffer *bytes.Buffer) {
+	binary.Write(buffer, binary.BigEndian, c.GetID().GetBytes())
+	binary.Write(buffer, binary.LittleEndian, c.ChunkSize)
 }
 
 func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
@@ -54,9 +53,44 @@ func (f WAVFormat) Decode(data []byte) (audio.Audio, error) {
 	return audio, nil
 }
 
-// TODO implement
 func (f WAVFormat) Encode(audio audio.Audio) []byte {
-	return []byte("")
+
+	buffer := new(bytes.Buffer)
+
+	RIFFChunk{
+		WAVChunk: WAVChunk{
+			Chunk: utils.Chunk{
+				ChunkID: RIFFID,
+			},
+			ChunkSize: 36 + uint32(len(audio.Samples)),
+		},
+		Format: WAVEID,
+		FormatChunk: FormatChunk{
+			WAVChunk: WAVChunk{
+				Chunk: utils.Chunk{
+					ChunkID: FORMATID,
+				},
+				ChunkSize: 16,
+			},
+			AudioFormat:   1,
+			NumChannels:   audio.NumChannels,
+			SampleRate:    uint32(audio.SampleRate),
+			ByteRate:      uint32(audio.SampleRate) * uint32(audio.NumChannels) * uint32(audio.BitDepth) / 8,
+			BlockAlign:    audio.NumChannels * audio.BitDepth / 8,
+			BitsPerSample: audio.BitDepth,
+		},
+		DataChunk: DataChunk{
+			WAVChunk: WAVChunk{
+				Chunk: utils.Chunk{
+					ChunkID: DATAID,
+				},
+				ChunkSize: uint32(len(audio.Samples)),
+			},
+			Data: audio.Samples,
+		},
+	}.Write(buffer)
+
+	return buffer.Bytes()
 }
 
 func (f WAVFormat) IsFormat(data []byte) bool {

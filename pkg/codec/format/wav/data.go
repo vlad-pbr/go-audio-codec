@@ -15,8 +15,10 @@ type DataChunk struct {
 	Data []byte
 }
 
-func (c DataChunk) GetBytes() []byte {
-	return c.MakeChunkBytes()
+func (c DataChunk) Write(buffer *bytes.Buffer) {
+
+	c.ReadHeaders(buffer)
+	binary.Write(buffer, binary.LittleEndian, c.Data) // prob where the problem is
 }
 
 func NewDataChunk(buffer *bytes.Buffer) (DataChunk, error) {
