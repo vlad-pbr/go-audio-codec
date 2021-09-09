@@ -59,7 +59,7 @@ func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 			Chunk: utils.Chunk{
 				ChunkID: RIFFID,
 			},
-			ChunkSize: 36 + uint32(len(audio.Samples)),
+			ChunkSize: 36 + uint32(audio.SamplesLength()),
 		},
 		Format: WAVEID,
 		FormatChunk: FormatChunk{
@@ -70,20 +70,20 @@ func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 				ChunkSize: 16,
 			},
 			AudioFormat:   1,
-			NumChannels:   audio.NumChannels,
-			SampleRate:    uint32(audio.SampleRate),
-			ByteRate:      uint32(audio.SampleRate) * uint32(audio.NumChannels) * uint32(audio.BitDepth) / 8,
-			BlockAlign:    audio.NumChannels * audio.BitDepth / 8,
-			BitsPerSample: audio.BitDepth,
+			NumChannels:   audio.NumChannels(),
+			SampleRate:    uint32(audio.SampleRate()),
+			ByteRate:      uint32(audio.SampleRate()) * uint32(audio.NumChannels()) * uint32(audio.BitDepth()) / 8,
+			BlockAlign:    audio.NumChannels() * audio.BitDepth() / 8,
+			BitsPerSample: audio.BitDepth(),
 		},
 		DataChunk: DataChunk{
 			WAVChunk: WAVChunk{
 				Chunk: utils.Chunk{
 					ChunkID: DATAID,
 				},
-				ChunkSize: uint32(len(audio.Samples)),
+				ChunkSize: uint32(audio.SamplesLength()),
 			},
-			Data: audio.GetSamples(binary.LittleEndian),
+			Data: audio.Samples(binary.LittleEndian),
 		},
 	}.Write(buffer)
 }

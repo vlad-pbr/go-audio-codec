@@ -7,34 +7,50 @@ import (
 )
 
 type Audio struct {
-	NumChannels uint16
-	SampleRate  uint64
-	BitDepth    uint16
-	Samples     []byte
+	numChannels uint16
+	sampleRate  uint64
+	bitDepth    uint16
+	samples     []byte
 	order       binary.ByteOrder
 }
 
-func (a Audio) String() string {
-	return fmt.Sprintf("Channels: %d\nSample Rate: %d\nBit Depth: %d", a.NumChannels, a.SampleRate, a.BitDepth)
+func (a Audio) NumChannels() uint16 {
+	return a.numChannels
 }
 
-func (a Audio) GetSamples(order binary.ByteOrder) []byte {
+func (a Audio) SampleRate() uint64 {
+	return a.sampleRate
+}
+
+func (a Audio) BitDepth() uint16 {
+	return a.bitDepth
+}
+
+func (a Audio) Samples(order binary.ByteOrder) []byte {
 
 	if order == a.order {
-		return a.Samples
+		return a.samples
 	}
 
-	return toggleEndianness(a.BitDepth, a.Samples)
+	return toggleEndianness(a.bitDepth, a.samples)
+}
+
+func (a Audio) SamplesLength() int {
+	return len(a.samples)
+}
+
+func (a Audio) String() string {
+	return fmt.Sprintf("Channels: %d\nSample Rate: %d\nBit Depth: %d", a.numChannels, a.sampleRate, a.bitDepth)
 }
 
 func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []byte, order binary.ByteOrder) (Audio, error) {
 
 	// init audio container
 	audio := Audio{
-		NumChannels: numChannels,
-		SampleRate:  sampleRate,
-		BitDepth:    bitDepth,
-		Samples:     samples,
+		numChannels: numChannels,
+		sampleRate:  sampleRate,
+		bitDepth:    bitDepth,
+		samples:     samples,
 		order:       order,
 	}
 

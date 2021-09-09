@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
@@ -71,15 +72,14 @@ func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 	// calculate samplerate from extended precision float bytes
 	sampleRate, _ := aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float().Uint64()
 
-	// fill audio struct with metadata
-	audio := audio.Audio{
-		NumChannels: uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
-		BitDepth:    uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
-		SampleRate:  sampleRate,
-		Samples:     aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData,
-	}
-
-	return audio, nil
+	// generate audio container
+	return audio.NewAudio(
+		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
+		sampleRate,
+		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
+		aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData,
+		binary.BigEndian,
+	)
 }
 
 // TODO implement
