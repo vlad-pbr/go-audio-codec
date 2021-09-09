@@ -37,12 +37,8 @@ func NewFormatChunk(buffer *bytes.Buffer) (FormatChunk, error) {
 	// define chunk struct
 	var formatChunk FormatChunk
 
-	// parse fmt chunk ID
-	copy(formatChunk.ChunkID[:], utils.Next(buffer, 4))
-	if !bytes.Equal(formatChunk.ChunkID[:], FORMATID[:]) {
-		return formatChunk, fmt.Errorf("fmt chunk ID is invalid: found %s, must be %s", formatChunk.ChunkID, FORMATID)
-	}
-
+	// set fmt chunk ID
+	formatChunk.ChunkID = FORMATID
 	formatChunk.ChunkSize = binary.LittleEndian.Uint32(utils.Next(buffer, 4))
 
 	// make sure PCM is specified

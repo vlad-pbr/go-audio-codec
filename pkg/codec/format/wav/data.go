@@ -3,7 +3,6 @@ package wav
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -26,12 +25,8 @@ func NewDataChunk(buffer *bytes.Buffer) (DataChunk, error) {
 	// define chunk struct
 	var dataChunk DataChunk
 
-	// parse data chunk ID
-	copy(dataChunk.ChunkID[:], utils.Next(buffer, 4))
-	if !bytes.Equal(dataChunk.ChunkID[:], DATAID[:]) {
-		return dataChunk, fmt.Errorf("data chunk ID is invalid: found %s, must be %s", dataChunk.ChunkID, DATAID)
-	}
-
+	// set data chunk ID
+	dataChunk.ChunkID = DATAID
 	dataChunk.ChunkSize = binary.LittleEndian.Uint32(utils.Next(buffer, 4))
 	dataChunk.Data = utils.Next(buffer, int(dataChunk.ChunkSize)) // TODO this is terrible
 

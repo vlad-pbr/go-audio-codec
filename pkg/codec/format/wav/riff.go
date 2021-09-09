@@ -60,16 +60,51 @@ func NewRIFFChunk(buffer *bytes.Buffer) (RIFFChunk, error) {
 		return riff, fmt.Errorf("error while decoding RIFF chunk headers: %s", err.Error())
 	}
 
-	// decode fmt
-	riff.FormatChunk, err = NewFormatChunk(buffer)
-	if err != nil {
-		return riff, fmt.Errorf("error while decoding fmt chunk: %s", err.Error())
+	// the following chunks must be present
+	var presentChunks = map[string]bool{
+		string(FORMATID[:]): false,
+		string(DATAID[:]):   false,
 	}
 
-	// decode data
-	riff.DataChunk, err = NewDataChunk(buffer)
-	if err != nil {
-		return riff, fmt.Errorf("error while decoding data chunk: %s", err.Error())
+	// read until end of buffer
+	for buffer.Len() > 0 {
+
+		var chunkID utils.FourCC
+		copy(chunkID[:], utils.Next(buffer, 4))
+
+		// decode fmt
+		if bytes.Equal(chunkID[:], FORMATID[:]) {
+			riff.FormatChunk, err = NewFormatChunk(buffer)
+			if err != nil {
+				return riff, fmt.Errorf("error while decoding fmt chunk: %s", err.Error())
+			}
+
+			presentChunks[string(FORMATID[:])] = true
+
+			// decode data
+		} else if bytes.Equal(chunkID[:], DATAID[:]) {
+			riff.DataChunk, err = NewDataChunk(buffer)
+			if err != nil {
+				return riff, fmt.Errorf("error while decoding data chunk: %s", err.Error())
+			}
+
+			presentChunks[string(DATAID[:])] = true
+
+			// skip chunk
+		} else {
+			utils.Next(buffer, int(binary.LittleEndian.Uint32(utils.Next(buffer, 4))))
+		}
+
+	}
+
+	// make sure all required chunks are present
+	for chunk, present := range presentChunks {
+		var chunkFourCC utils.FourCC
+		copy(chunkFourCC[:], chunk[:])
+
+		if !present {
+			return riff, fmt.Errorf("%s chunk is not present", chunk)
+		}
 	}
 
 	return riff, nil
