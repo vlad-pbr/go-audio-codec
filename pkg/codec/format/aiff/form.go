@@ -94,8 +94,8 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 		presentChunks[fourCC] = false
 	}
 
-	// read until end of buffer (account for zero padding)
-	for buffer.Len() > 1 {
+	// read until end of buffer
+	for buffer.Len() != 0 {
 
 		var chunkID utils.FourCC
 		copy(chunkID[:], utils.Next(buffer, 4))
@@ -130,8 +130,6 @@ func NewFormChunk(buffer *bytes.Buffer) (FormChunk, error) {
 			}
 		}
 	}
-
-	adjustForZeroPadding(form.ChunkSize, buffer)
 
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {
