@@ -99,9 +99,6 @@ func NewRIFFChunk(buffer *bytes.Buffer) (RIFFChunk, error) {
 
 	// make sure all required chunks are present
 	for chunk, present := range presentChunks {
-		var chunkFourCC utils.FourCC
-		copy(chunkFourCC[:], chunk[:])
-
 		if !present {
 			return riff, fmt.Errorf("%s chunk is not present", chunk)
 		}
