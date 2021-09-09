@@ -19,7 +19,7 @@ var RIFFID utils.FourCC = [4]byte{82, 73, 70, 70} // RIFF
 var WAVEID utils.FourCC = [4]byte{87, 65, 86, 69} // WAVE
 
 func (c RIFFChunk) Write(buffer *bytes.Buffer) {
-	c.ReadHeaders(buffer)
+	c.WriteHeaders(buffer)
 	binary.Write(buffer, binary.BigEndian, c.Format.GetBytes())
 	c.FormatChunk.Write(buffer)
 	c.DataChunk.Write(buffer)

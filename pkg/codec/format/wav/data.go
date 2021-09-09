@@ -16,7 +16,7 @@ type DataChunk struct {
 
 func (c DataChunk) Write(buffer *bytes.Buffer) {
 
-	c.ReadHeaders(buffer)
+	c.WriteHeaders(buffer)
 	binary.Write(buffer, binary.LittleEndian, c.Data) // prob where the problem is
 }
 

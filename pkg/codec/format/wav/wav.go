@@ -29,7 +29,7 @@ func NewWAVFormat(buffer *bytes.Buffer) (WAVFormat, error) {
 	return WAVFormat{RIFFChunk: riffChunk}, nil
 }
 
-func (c WAVChunk) ReadHeaders(buffer *bytes.Buffer) {
+func (c WAVChunk) WriteHeaders(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.GetID().GetBytes())
 	binary.Write(buffer, binary.LittleEndian, c.ChunkSize)
 }

@@ -22,7 +22,7 @@ type FormatChunk struct {
 
 func (c FormatChunk) Write(buffer *bytes.Buffer) {
 
-	c.ReadHeaders(buffer)
+	c.WriteHeaders(buffer)
 	binary.Write(buffer, binary.LittleEndian, c.AudioFormat)
 	binary.Write(buffer, binary.LittleEndian, c.NumChannels)
 	binary.Write(buffer, binary.LittleEndian, c.SampleRate)
