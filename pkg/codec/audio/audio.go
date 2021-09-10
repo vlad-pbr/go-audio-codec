@@ -19,8 +19,19 @@ func (a Audio) NumChannels() uint16 {
 	return a.numChannels
 }
 
+func (a *Audio) SetNumChannels(numChannels uint16) {
+
+	// TODO properly implement
+
+	a.numChannels = numChannels
+}
+
 func (a Audio) SampleRate() uint64 {
 	return a.sampleRate
+}
+
+func (a *Audio) SetSampleRate(sampleRate uint64) {
+	a.sampleRate = sampleRate
 }
 
 func (a Audio) BitDepth() uint16 {
@@ -29,7 +40,8 @@ func (a Audio) BitDepth() uint16 {
 
 func (a *Audio) SetBitDepth(bitDepth uint16) {
 
-	// TODO pad extra bytes if need be
+	// TODO pad extra bytes if bigger than current
+	// alter samples to fit smaller bitdepth if smaller than current
 
 	a.bitDepth = bitDepth
 }
@@ -44,15 +56,33 @@ func (a *Audio) Samples(order binary.ByteOrder) []byte {
 	return a.samples
 }
 
-func (a Audio) ByteLength() int {
+func (a *Audio) SetSamples(samples []byte, order binary.ByteOrder) error {
+
+	// make sure samples frames fit the given samples
+	{
+		sampleFrameSize := a.ByteDepth() * int(a.NumChannels())
+		samplesBytesLength := len(samples)
+
+		if samplesBytesLength%sampleFrameSize != 0 {
+			return fmt.Errorf("given sample bytes do not match the given sample frame size: %d (length of samples bytes array) %% %d (sample frame size) should be 0", samplesBytesLength, sampleFrameSize)
+		}
+	}
+
+	a.samples = samples
+	a.order = order
+
+	return nil
+}
+
+func (a Audio) BytesAmount() int {
 	return len(a.samples)
 }
 
 func (a Audio) SamplesAmount() int {
-	return a.ByteLength() / int(a.numChannels) / a.ByteDepth()
+	return a.BytesAmount() / int(a.numChannels) / a.ByteDepth()
 }
 
-func (a Audio) AudioLength() float64 {
+func (a Audio) Length() float64 {
 	return float64(a.SamplesAmount() / int(a.sampleRate))
 }
 
@@ -60,7 +90,7 @@ func (a Audio) String() string {
 	return fmt.Sprintf("Length: %s\n"+
 		"Channels: %d\n"+
 		"Sample Rate: %d\n"+
-		"Bit Depth: %d", time.Duration(a.AudioLength()*float64(time.Second)), a.numChannels, a.sampleRate, a.bitDepth)
+		"Bit Depth: %d", time.Duration(a.Length()*float64(time.Second)), a.numChannels, a.sampleRate, a.bitDepth)
 }
 
 func (a Audio) ByteDepth() int {
@@ -89,24 +119,15 @@ func (a *Audio) toggleEndianness() {
 func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []byte, order binary.ByteOrder) (Audio, error) {
 
 	// init audio container
-	audio := Audio{
+	a := Audio{
 		numChannels: numChannels,
 		sampleRate:  sampleRate,
 		bitDepth:    bitDepth,
-		samples:     samples,
-		order:       order,
 	}
 
-	// make sure samples frames fit the given samples
-	{
-		sampleFrameSize := audio.ByteDepth() * int(audio.NumChannels())
-		samplesBytesLength := len(audio.samples)
-
-		if samplesBytesLength%sampleFrameSize != 0 {
-			return audio, fmt.Errorf("given sample bytes do not match the given sample frame size: %d (length of samples bytes array) %% %d (sample frame size) should be 0", samplesBytesLength, sampleFrameSize)
-		}
+	if err := a.SetSamples(samples, order); err != nil {
+		return a, fmt.Errorf("could not create audio container: %s", err.Error())
 	}
 
-	return audio, nil
-
+	return a, nil
 }
