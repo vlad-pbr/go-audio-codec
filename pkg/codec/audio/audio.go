@@ -19,13 +19,6 @@ func (a Audio) NumChannels() uint16 {
 	return a.numChannels
 }
 
-func (a *Audio) SetNumChannels(numChannels uint16) {
-
-	// TODO properly implement
-
-	a.numChannels = numChannels
-}
-
 func (a Audio) SampleRate() uint64 {
 	return a.sampleRate
 }
@@ -36,14 +29,6 @@ func (a *Audio) SetSampleRate(sampleRate uint64) {
 
 func (a Audio) BitDepth() uint16 {
 	return a.bitDepth
-}
-
-func (a *Audio) SetBitDepth(bitDepth uint16) {
-
-	// TODO pad extra bytes if bigger than current
-	// alter samples to fit smaller bitdepth if smaller than current
-
-	a.bitDepth = bitDepth
 }
 
 func (a *Audio) Samples(order binary.ByteOrder) []byte {
