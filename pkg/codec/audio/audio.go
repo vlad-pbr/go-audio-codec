@@ -27,6 +27,13 @@ func (a Audio) BitDepth() uint16 {
 	return a.bitDepth
 }
 
+func (a *Audio) SetBitDepth(bitDepth uint16) {
+
+	// TODO pad extra bytes if need be
+
+	a.bitDepth = bitDepth
+}
+
 func (a *Audio) Samples(order binary.ByteOrder) []byte {
 
 	// toggle byte order if mismatch

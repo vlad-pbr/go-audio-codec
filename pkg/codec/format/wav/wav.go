@@ -54,6 +54,14 @@ func (f WAVFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
 func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 
+	// round bit depth to nearest multiple of 8
+	{
+		bitDepth := audio.BitDepth()
+		if bitDepth%8 != 0 {
+			audio.SetBitDepth(bitDepth + (bitDepth % 8))
+		}
+	}
+
 	RIFFChunk{
 		WAVChunk: WAVChunk{
 			Chunk: utils.Chunk{
@@ -72,8 +80,8 @@ func (f WAVFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 			AudioFormat:   1,
 			NumChannels:   audio.NumChannels(),
 			SampleRate:    uint32(audio.SampleRate()),
-			ByteRate:      uint32(audio.SampleRate()) * uint32(audio.NumChannels()) * uint32(audio.BitDepth()) / 8,
-			BlockAlign:    audio.NumChannels() * audio.BitDepth() / 8,
+			ByteRate:      uint32(audio.SampleRate()) * uint32(audio.NumChannels()) * uint32(audio.ByteDepth()),
+			BlockAlign:    audio.NumChannels() * uint16(audio.ByteDepth()),
 			BitsPerSample: audio.BitDepth(),
 		},
 		DataChunk: DataChunk{
