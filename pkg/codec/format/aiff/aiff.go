@@ -71,13 +71,15 @@ func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
 	// calculate samplerate from extended precision float bytes
 	sampleRate, _ := aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float().Uint64()
+	samplesLen := len(aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData)
+	samplesOffset := int(aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).BlockSize)
 
 	// generate audio container
 	return audio.NewAudio(
 		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
 		sampleRate,
 		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
-		aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData,
+		aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData[samplesOffset:samplesLen-samplesOffset],
 		binary.BigEndian,
 	)
 }
