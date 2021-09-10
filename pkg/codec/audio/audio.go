@@ -81,8 +81,6 @@ func (a *Audio) toggleEndianness() {
 
 func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []byte, order binary.ByteOrder) (Audio, error) {
 
-	// TODO validate
-
 	// init audio container
 	audio := Audio{
 		numChannels: numChannels,
@@ -90,6 +88,16 @@ func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []
 		bitDepth:    bitDepth,
 		samples:     samples,
 		order:       order,
+	}
+
+	// make sure samples frames fit the given samples
+	{
+		sampleFrameSize := audio.ByteDepth() * int(audio.NumChannels())
+		samplesBytesLength := len(audio.samples)
+
+		if samplesBytesLength%sampleFrameSize != 0 {
+			return audio, fmt.Errorf("given sample bytes do not match the given sample frame size: %d (length of samples bytes array) %% %d (sample frame size) should be 0", samplesBytesLength, sampleFrameSize)
+		}
 	}
 
 	return audio, nil
