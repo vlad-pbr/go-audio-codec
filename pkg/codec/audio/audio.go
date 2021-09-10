@@ -27,13 +27,14 @@ func (a Audio) BitDepth() uint16 {
 	return a.bitDepth
 }
 
-func (a Audio) Samples(order binary.ByteOrder) []byte {
+func (a *Audio) Samples(order binary.ByteOrder) []byte {
 
-	if order == a.order {
-		return a.samples
+	// toggle byte order if mismatch
+	if order != a.order {
+		a.toggleEndianness()
 	}
 
-	return toggleEndianness(a.bitDepth, a.samples)
+	return a.samples
 }
 
 func (a Audio) ByteLength() int {
@@ -41,7 +42,7 @@ func (a Audio) ByteLength() int {
 }
 
 func (a Audio) SamplesAmount() int {
-	return a.ByteLength() / int(a.numChannels) / sampleSizeBytes(a.bitDepth)
+	return a.ByteLength() / int(a.numChannels) / a.ByteDepth()
 }
 
 func (a Audio) AudioLength() float64 {
@@ -55,7 +56,32 @@ func (a Audio) String() string {
 		"Bit Depth: %d", time.Duration(a.AudioLength()*float64(time.Second)), a.numChannels, a.sampleRate, a.bitDepth)
 }
 
+func (a Audio) ByteDepth() int {
+	return int(math.Ceil(float64(a.bitDepth) / 8))
+}
+
+func (a *Audio) toggleEndianness() {
+
+	byteDepth := a.ByteDepth()
+
+	// swap order of bytes in each sample
+	for sampleStart, sampleEnd := 0, byteDepth-1; sampleStart < len(a.samples); sampleStart, sampleEnd = sampleStart+byteDepth, sampleEnd+byteDepth {
+		for sampleByteStart, sampleByteEnd := sampleStart, sampleEnd; sampleByteStart < sampleByteEnd; sampleByteStart, sampleByteEnd = sampleByteStart+1, sampleByteEnd-1 {
+			a.samples[sampleByteStart], a.samples[sampleByteEnd] = a.samples[sampleByteEnd], a.samples[sampleByteStart]
+		}
+	}
+
+	// toggle order field
+	if a.order == binary.BigEndian {
+		a.order = binary.LittleEndian
+	} else {
+		a.order = binary.BigEndian
+	}
+}
+
 func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []byte, order binary.ByteOrder) (Audio, error) {
+
+	// TODO validate
 
 	// init audio container
 	audio := Audio{
@@ -68,22 +94,4 @@ func NewAudio(numChannels uint16, sampleRate uint64, bitDepth uint16, samples []
 
 	return audio, nil
 
-}
-
-func toggleEndianness(bitDepth uint16, samples []byte) []byte {
-
-	var data []byte
-	sampleSize := sampleSizeBytes(bitDepth)
-
-	for sampleStart, sampleEnd := 0, sampleSize-1; sampleStart < len(samples); sampleStart, sampleEnd = sampleStart+sampleSize, sampleEnd+sampleSize {
-		for sample := sampleEnd; sample >= sampleStart; sample-- {
-			data = append(data, samples[sample])
-		}
-	}
-
-	return data
-}
-
-func sampleSizeBytes(bitDepth uint16) int {
-	return int(math.Ceil(float64(bitDepth) / 8))
 }
