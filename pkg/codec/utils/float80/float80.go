@@ -30,7 +30,6 @@ func (f Float80) Float() *big.Float {
 	return big.NewFloat(0).SetPrec(64).SetMantExp(mantissaFloat, int(exp))
 }
 
-// TODO implement
 func (f Float80) Bytes() [10]byte {
 
 	buffer := new(bytes.Buffer)
