@@ -1,6 +1,7 @@
 package float80
 
 import (
+	"bytes"
 	"encoding/binary"
 	"math"
 	"math/big"
@@ -31,7 +32,16 @@ func (f Float80) Float() *big.Float {
 
 // TODO implement
 func (f Float80) Bytes() [10]byte {
-	return [10]byte{}
+
+	buffer := new(bytes.Buffer)
+	var ret [10]byte
+
+	binary.Write(buffer, binary.BigEndian, f.Exponent)
+	binary.Write(buffer, binary.BigEndian, f.Mantissa)
+
+	copy(ret[:], buffer.Bytes())
+
+	return ret
 }
 
 // TODO implement
