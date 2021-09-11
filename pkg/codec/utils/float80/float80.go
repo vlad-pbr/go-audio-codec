@@ -30,8 +30,8 @@ func (f Float80) Float() *big.Float {
 }
 
 // TODO implement
-func (f Float80) Bytes() []byte {
-	return []byte("")
+func (f Float80) Bytes() [10]byte {
+	return [10]byte{}
 }
 
 // TODO implement
