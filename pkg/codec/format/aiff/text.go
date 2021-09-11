@@ -33,10 +33,9 @@ type AnnotationChunk struct {
 	TextChunk
 }
 
-func (c TextChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.Text,
-	)
+func (c TextChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.Text)
 }
 
 func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {

@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -25,28 +26,32 @@ type MarkerChunk struct {
 	Markers    []Marker
 }
 
-func (c Marker) GetBytes() []byte {
-	return utils.GetBytes(
-		false,
-		c.MarkerID,
-		c.Position,
-		c.MarkerName,
-	)
+func (c Marker) Write(buffer *bytes.Buffer) {
+	binary.Write(buffer, binary.BigEndian, c.MarkerID)
+	binary.Write(buffer, binary.BigEndian, c.Position)
+	binary.Write(buffer, binary.BigEndian, c.MarkerName)
 }
 
-func (c MarkerChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.NumMarkers,
-		GetMarkersBytes(c.Markers),
-	)
-}
+func (c MarkerChunk) Write(buffer *bytes.Buffer) {
 
-// TODO implement
-func GetMarkersBytes(markers []Marker) []byte {
-	return []byte("")
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.NumMarkers)
+
+	for _, marker := range c.Markers {
+		marker.Write(buffer)
+	}
+
 }
 
 // TODO implement
 func NewMarkerChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
+
+	var markerChunk MarkerChunk
+	markerChunk.ChunkID = MARKERID
+	markerChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	markerChunk.NumMarkers = binary.BigEndian.Uint16(utils.Next(buffer, 2))
+
+	// TODO
+
 	return MarkerChunk{}, nil
 }

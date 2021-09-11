@@ -19,13 +19,12 @@ type CommonChunk struct {
 	SampleRate      float80.Float80 // SAMPLE FRAME (not samples themselves) played back / sec
 }
 
-func (c CommonChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.NumChannels,
-		c.NumSampleFrames,
-		c.SampleSize,
-		c.SampleRate,
-	)
+func (c CommonChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.NumChannels)
+	binary.Write(buffer, binary.BigEndian, c.NumSampleFrames)
+	binary.Write(buffer, binary.BigEndian, c.SampleSize)
+	binary.Write(buffer, binary.BigEndian, c.SampleRate.Bytes())
 }
 
 func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {

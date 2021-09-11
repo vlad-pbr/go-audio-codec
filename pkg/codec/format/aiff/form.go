@@ -46,11 +46,14 @@ type FormChunk struct {
 	LocalChunks []utils.ChunkInterface
 }
 
-func (c FormChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.FormType,
-		utils.GetChunksBytes(c.LocalChunks),
-	)
+func (c FormChunk) Write(buffer *bytes.Buffer) {
+
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.FormType[:])
+
+	for _, localChunk := range c.LocalChunks {
+		localChunk.Write(buffer)
+	}
 }
 
 func FormHeaders(buffer *bytes.Buffer) (utils.FourCC, int32, utils.FourCC, error) {

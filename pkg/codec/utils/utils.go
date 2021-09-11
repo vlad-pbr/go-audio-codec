@@ -22,7 +22,7 @@ func (c Chunk) GetBytesWithID(fields ...interface{}) []byte {
 
 type ChunkInterface interface {
 	GetID() FourCC
-	GetBytes() []byte
+	Write(buffer *bytes.Buffer)
 }
 
 func (c Chunk) GetID() FourCC {

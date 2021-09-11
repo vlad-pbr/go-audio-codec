@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -13,10 +14,9 @@ type AudioRecordingChunk struct { // size is always 24
 	AESChannelStatusData [24]byte
 }
 
-func (c AudioRecordingChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.AESChannelStatusData,
-	)
+func (c AudioRecordingChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.AESChannelStatusData[:])
 }
 
 // TODO implement

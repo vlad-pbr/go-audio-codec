@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -21,21 +22,22 @@ type CommentsChunk struct {
 	Comments    []Comment
 }
 
-func (c Comment) GetBytes() []byte {
-	return utils.GetBytes(
-		true,
-		c.TimeStamp,
-		c.Marker,
-		c.Count,
-		c.Text,
-	)
+func (c Comment) Write(buffer *bytes.Buffer) {
+	binary.Write(buffer, binary.BigEndian, c.TimeStamp)
+	binary.Write(buffer, binary.BigEndian, c.Marker)
+	binary.Write(buffer, binary.BigEndian, c.Count)
+	binary.Write(buffer, binary.BigEndian, c.Text)
 }
 
-func (c CommentsChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.NumComments,
-		GetCommentsBytes(c.Comments),
-	)
+func (c CommentsChunk) Write(buffer *bytes.Buffer) {
+
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.NumComments)
+
+	for _, comment := range c.Comments {
+		comment.Write(buffer)
+	}
+
 }
 
 // TODO implement

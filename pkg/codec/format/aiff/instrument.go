@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -27,27 +28,23 @@ type InstrumentChunk struct { // size is always 20
 	ReleaseLoop  Loop
 }
 
-func (l Loop) GetBytes() []byte {
-	return utils.GetBytes(
-		false,
-		l.PlayMode,
-		l.BeginLoop,
-		l.EndLoop,
-	)
+func (l Loop) Write(buffer *bytes.Buffer) {
+	binary.Write(buffer, binary.BigEndian, l.PlayMode)
+	binary.Write(buffer, binary.BigEndian, l.BeginLoop)
+	binary.Write(buffer, binary.BigEndian, l.EndLoop)
 }
 
-func (c InstrumentChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.BaseNote,
-		c.Detune,
-		c.LowNote,
-		c.HighNote,
-		c.LowVelocity,
-		c.HighVelocity,
-		c.Gain,
-		c.SustainLoop.GetBytes(),
-		c.ReleaseLoop.GetBytes(),
-	)
+func (c InstrumentChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.BaseNote)
+	binary.Write(buffer, binary.BigEndian, c.Detune)
+	binary.Write(buffer, binary.BigEndian, c.LowNote)
+	binary.Write(buffer, binary.BigEndian, c.HighNote)
+	binary.Write(buffer, binary.BigEndian, c.LowVelocity)
+	binary.Write(buffer, binary.BigEndian, c.HighVelocity)
+	binary.Write(buffer, binary.BigEndian, c.Gain)
+	c.SustainLoop.Write(buffer)
+	c.ReleaseLoop.Write(buffer)
 }
 
 // TODO implement

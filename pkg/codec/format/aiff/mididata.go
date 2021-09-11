@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -13,10 +14,9 @@ type MIDIDataChunk struct {
 	MIDIData []byte
 }
 
-func (c MIDIDataChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.MIDIData,
-	)
+func (c MIDIDataChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.MIDIData)
 }
 
 // TODO implement

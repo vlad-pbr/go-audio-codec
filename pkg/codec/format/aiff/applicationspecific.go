@@ -2,6 +2,7 @@ package aiff
 
 import (
 	"bytes"
+	"encoding/binary"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
 )
@@ -14,11 +15,10 @@ type ApplicationSpecificChunk struct {
 	Data                 []byte
 }
 
-func (c ApplicationSpecificChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.ApplicationSignature,
-		c.Data,
-	)
+func (c ApplicationSpecificChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.ApplicationSignature[:])
+	binary.Write(buffer, binary.BigEndian, c.Data)
 }
 
 // TODO implement

@@ -16,12 +16,11 @@ type SoundDataChunk struct {
 	SoundData []byte // sample frame size is always a multiple of 8
 }
 
-func (c SoundDataChunk) GetBytes() []byte {
-	return c.MakeChunkBytes(
-		c.Offset,
-		c.BlockSize,
-		c.SoundData,
-	)
+func (c SoundDataChunk) Write(buffer *bytes.Buffer) {
+	c.WriteHeaders(buffer)
+	binary.Write(buffer, binary.BigEndian, c.Offset)
+	binary.Write(buffer, binary.BigEndian, c.BlockSize)
+	binary.Write(buffer, binary.BigEndian, c.SoundData)
 }
 
 func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {

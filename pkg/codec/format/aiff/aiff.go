@@ -18,11 +18,9 @@ type AIFFChunk struct {
 	ChunkSize int32 // in size is odd - zero pad must be present
 }
 
-func (c AIFFChunk) MakeChunkBytes(fields ...interface{}) []byte {
-	return c.GetBytesWithID(
-		c.ChunkSize,
-		utils.GetBytes(true, fields),
-	)
+func (c AIFFChunk) WriteHeaders(buffer *bytes.Buffer) {
+	binary.Write(buffer, binary.BigEndian, c.GetID().GetBytes())
+	binary.Write(buffer, binary.BigEndian, c.ChunkSize)
 }
 
 func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
