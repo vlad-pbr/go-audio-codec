@@ -21,7 +21,13 @@ func (c ApplicationSpecificChunk) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.Data)
 }
 
-// TODO implement
 func NewApplicationSpecificChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
+
+	var asChunk ApplicationSpecificChunk
+	asChunk.ChunkID = APPLICATIONSPECIFICID
+	asChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	copy(asChunk.ApplicationSignature[:], utils.Next(buffer, 4))
+	asChunk.Data = utils.Next(buffer, int(asChunk.ChunkSize-4))
+
 	return ApplicationSpecificChunk{}, nil
 }
