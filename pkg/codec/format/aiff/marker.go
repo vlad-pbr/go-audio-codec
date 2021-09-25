@@ -3,21 +3,20 @@ package aiff
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/pstring"
 )
 
 var MARKERID utils.FourCC = [4]byte{77, 65, 82, 75} // MARK
-
-// TODO pascal string
-type pstring []byte
 
 type MarkerID int16
 
 type Marker struct {
 	MarkerID   MarkerID
 	Position   uint32
-	MarkerName pstring
+	MarkerName pstring.Pstring
 }
 
 type MarkerChunk struct {
@@ -29,7 +28,8 @@ type MarkerChunk struct {
 func (c Marker) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.MarkerID)
 	binary.Write(buffer, binary.BigEndian, c.Position)
-	binary.Write(buffer, binary.BigEndian, c.MarkerName)
+	buffer.Write(c.MarkerName.Bytes())
+	// ADJUST
 }
 
 func (c MarkerChunk) Write(buffer *bytes.Buffer) {
@@ -43,7 +43,6 @@ func (c MarkerChunk) Write(buffer *bytes.Buffer) {
 
 }
 
-// TODO implement
 func NewMarkerChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 
 	var markerChunk MarkerChunk
@@ -51,7 +50,26 @@ func NewMarkerChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	markerChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
 	markerChunk.NumMarkers = binary.BigEndian.Uint16(utils.Next(buffer, 2))
 
-	// TODO
+	for i := 0; i < int(markerChunk.NumMarkers); i++ {
 
-	return MarkerChunk{}, nil
+		// init marker
+		marker := Marker{
+			MarkerID: MarkerID(binary.BigEndian.Uint16(utils.Next(buffer, 2))),
+			Position: binary.BigEndian.Uint32(utils.Next(buffer, 4)),
+		}
+
+		// decode pstring
+		pstringLength := uint8(utils.Next(buffer, 1)[0])
+		var err error
+		marker.MarkerName, err = pstring.New(pstringLength, utils.Next(buffer, int(pstringLength)))
+
+		if err != nil {
+			return markerChunk, fmt.Errorf("could not decode marker name: %s", err.Error())
+		}
+
+		// adjust by pstring length
+		adjustForZeroPadding(int32(pstringLength), buffer)
+	}
+
+	return markerChunk, nil
 }
