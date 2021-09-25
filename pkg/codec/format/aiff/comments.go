@@ -40,12 +40,30 @@ func (c CommentsChunk) Write(buffer *bytes.Buffer) {
 
 }
 
-// TODO implement
-func GetCommentsBytes(comments []Comment) []byte {
-	return []byte("")
-}
-
-// TODO implement
 func NewCommentsChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return CommentsChunk{}, nil
+
+	// define chunk struct
+	var commentsChunk CommentsChunk
+	commentsChunk.ChunkID = COMMENTSID
+	commentsChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	commentsChunk.NumComments = binary.BigEndian.Uint16(utils.Next(buffer, 2))
+
+	for i := 0; i < int(commentsChunk.NumComments); i++ {
+
+		// read comment chunk
+		comment := Comment{
+			TimeStamp: binary.BigEndian.Uint32(utils.Next(buffer, 4)),
+			Marker:    MarkerID(binary.BigEndian.Uint16(utils.Next(buffer, 2))),
+			Count:     binary.BigEndian.Uint16(utils.Next(buffer, 2)),
+		}
+		comment.Text = utils.Next(buffer, int(comment.Count))
+
+		// adjust by count
+		adjustForZeroPadding(int32(comment.Count), buffer)
+
+		// add to comments slice
+		commentsChunk.Comments = append(commentsChunk.Comments, comment)
+	}
+
+	return commentsChunk, nil
 }
