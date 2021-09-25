@@ -29,7 +29,8 @@ func (c Marker) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.MarkerID)
 	binary.Write(buffer, binary.BigEndian, c.Position)
 	buffer.Write(c.MarkerName.Bytes())
-	// ADJUST
+
+	adjustForZeroPadding(int32(c.MarkerName.Length()), buffer, true)
 }
 
 func (c MarkerChunk) Write(buffer *bytes.Buffer) {
@@ -68,7 +69,7 @@ func NewMarkerChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 		}
 
 		// adjust by pstring length
-		adjustForZeroPadding(int32(pstringLength), buffer)
+		adjustForZeroPadding(int32(pstringLength), buffer, false)
 	}
 
 	return markerChunk, nil

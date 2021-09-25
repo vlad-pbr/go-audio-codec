@@ -21,6 +21,8 @@ func (c SoundDataChunk) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.Offset)
 	binary.Write(buffer, binary.BigEndian, c.BlockSize)
 	binary.Write(buffer, binary.BigEndian, c.SoundData)
+
+	adjustForZeroPadding(c.ChunkSize, buffer, true)
 }
 
 func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
@@ -36,7 +38,7 @@ func NewSoundChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	// actual semantics of these samples are only relevant when decoding to audio struct
 	soundChunk.SoundData = utils.Next(buffer, int(soundChunk.ChunkSize)-8)
 
-	adjustForZeroPadding(soundChunk.ChunkSize, buffer)
+	adjustForZeroPadding(soundChunk.ChunkSize, buffer, false)
 
 	return soundChunk, nil
 }

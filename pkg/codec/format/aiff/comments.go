@@ -27,6 +27,8 @@ func (c Comment) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.Marker)
 	binary.Write(buffer, binary.BigEndian, c.Count)
 	binary.Write(buffer, binary.BigEndian, c.Text)
+
+	adjustForZeroPadding(int32(c.Count), buffer, true)
 }
 
 func (c CommentsChunk) Write(buffer *bytes.Buffer) {
@@ -59,7 +61,7 @@ func NewCommentsChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 		comment.Text = utils.Next(buffer, int(comment.Count))
 
 		// adjust by count
-		adjustForZeroPadding(int32(comment.Count), buffer)
+		adjustForZeroPadding(int32(comment.Count), buffer, false)
 
 		// add to comments slice
 		commentsChunk.Comments = append(commentsChunk.Comments, comment)

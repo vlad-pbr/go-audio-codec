@@ -34,11 +34,15 @@ func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
 	return AIFFFormat{FormChunk: formChunk}, nil
 }
 
-func adjustForZeroPadding(size int32, buffer *bytes.Buffer) {
+func adjustForZeroPadding(size int32, buffer *bytes.Buffer, pad bool) {
 
-	// drop zero pad byte if chunk size is odd
+	// drop/add zero pad byte if chunk size is odd
 	if size%2 != 0 {
-		utils.Next(buffer, 1)
+		if pad {
+			buffer.Write([]byte{0})
+		} else {
+			utils.Next(buffer, 1)
+		}
 	}
 
 }

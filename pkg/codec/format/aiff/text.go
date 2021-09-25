@@ -36,6 +36,8 @@ type AnnotationChunk struct {
 func (c TextChunk) Write(buffer *bytes.Buffer) {
 	c.WriteHeaders(buffer)
 	binary.Write(buffer, binary.BigEndian, c.Text)
+
+	adjustForZeroPadding(c.ChunkSize, buffer, true)
 }
 
 func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
@@ -46,7 +48,7 @@ func NewTextChunk(buffer *bytes.Buffer, fourCC utils.FourCC) TextChunk {
 	textChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
 	textChunk.Text = utils.Next(buffer, int(textChunk.ChunkSize))
 
-	adjustForZeroPadding(textChunk.ChunkSize, buffer)
+	adjustForZeroPadding(textChunk.ChunkSize, buffer, false)
 
 	return textChunk
 }

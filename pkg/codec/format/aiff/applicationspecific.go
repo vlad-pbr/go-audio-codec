@@ -19,6 +19,8 @@ func (c ApplicationSpecificChunk) Write(buffer *bytes.Buffer) {
 	c.WriteHeaders(buffer)
 	binary.Write(buffer, binary.BigEndian, c.ApplicationSignature[:])
 	binary.Write(buffer, binary.BigEndian, c.Data)
+
+	adjustForZeroPadding(c.ChunkSize, buffer, true)
 }
 
 func NewApplicationSpecificChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
@@ -29,7 +31,7 @@ func NewApplicationSpecificChunk(buffer *bytes.Buffer) (utils.ChunkInterface, er
 	copy(asChunk.ApplicationSignature[:], utils.Next(buffer, 4))
 	asChunk.Data = utils.Next(buffer, int(asChunk.ChunkSize-4))
 
-	adjustForZeroPadding(asChunk.ChunkSize, buffer)
+	adjustForZeroPadding(asChunk.ChunkSize, buffer, false)
 
 	return ApplicationSpecificChunk{}, nil
 }
