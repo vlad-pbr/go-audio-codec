@@ -29,5 +29,7 @@ func NewApplicationSpecificChunk(buffer *bytes.Buffer) (utils.ChunkInterface, er
 	copy(asChunk.ApplicationSignature[:], utils.Next(buffer, 4))
 	asChunk.Data = utils.Next(buffer, int(asChunk.ChunkSize-4))
 
+	adjustForZeroPadding(asChunk.ChunkSize, buffer)
+
 	return ApplicationSpecificChunk{}, nil
 }
