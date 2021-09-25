@@ -10,7 +10,6 @@ import (
 )
 
 type AIFFFormat struct {
-	FormChunk FormChunk
 }
 
 type AIFFChunk struct {
@@ -21,17 +20,6 @@ type AIFFChunk struct {
 func (c AIFFChunk) WriteHeaders(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.GetID().GetBytes())
 	binary.Write(buffer, binary.BigEndian, c.ChunkSize)
-}
-
-func NewAIFFFormat(buffer *bytes.Buffer) (AIFFFormat, error) {
-
-	// create form chunk
-	formChunk, err := NewFormChunk(buffer)
-	if err != nil {
-		return AIFFFormat{}, fmt.Errorf("error occurred while decoding FORM chunk: %s", err.Error())
-	}
-
-	return AIFFFormat{FormChunk: formChunk}, nil
 }
 
 func adjustForZeroPadding(size int32, buffer *bytes.Buffer, pad bool) {
@@ -49,17 +37,17 @@ func adjustForZeroPadding(size int32, buffer *bytes.Buffer, pad bool) {
 
 func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
-	// create new AIFF format
-	aiffFormat, err := NewAIFFFormat(data)
+	// create form chunk
+	formChunk, err := NewFormChunk(data)
 	if err != nil {
-		return audio.Audio{}, fmt.Errorf("error occurred while decoding AIFF: %s", err.Error())
+		return audio.Audio{}, fmt.Errorf("error occurred while decoding FORM chunk: %s", err.Error())
 	}
 
 	var commonChunkIndex int
 	var soundChunkIndex int
 
 	// find required form local chunks
-	for index, chunk := range aiffFormat.FormChunk.LocalChunks {
+	for index, chunk := range formChunk.LocalChunks {
 
 		chunkID := chunk.GetID()
 
@@ -72,16 +60,16 @@ func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 	}
 
 	// calculate samplerate from extended precision float bytes
-	sampleRate, _ := aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float().Uint64()
-	samplesLen := len(aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData)
-	samplesOffset := int(aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).Offset)
+	sampleRate, _ := formChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float().Uint64()
+	samplesLen := len(formChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData)
+	samplesOffset := int(formChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).Offset)
 
 	// generate audio container
 	return audio.NewAudio(
-		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
+		uint16(formChunk.LocalChunks[commonChunkIndex].(CommonChunk).NumChannels),
 		sampleRate,
-		uint16(aiffFormat.FormChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
-		aiffFormat.FormChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData[samplesOffset:samplesLen-samplesOffset],
+		uint16(formChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleSize),
+		formChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData[samplesOffset:samplesLen-samplesOffset],
 		binary.BigEndian,
 	)
 }

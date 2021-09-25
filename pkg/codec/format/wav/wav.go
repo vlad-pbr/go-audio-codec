@@ -10,23 +10,11 @@ import (
 )
 
 type WAVFormat struct {
-	RIFFChunk RIFFChunk
 }
 
 type WAVChunk struct {
 	utils.Chunk
 	ChunkSize uint32
-}
-
-func NewWAVFormat(buffer *bytes.Buffer) (WAVFormat, error) {
-
-	// create riff chunk
-	riffChunk, err := NewRIFFChunk(buffer)
-	if err != nil {
-		return WAVFormat{}, fmt.Errorf("error occurred while decoding RIFF chunk: %s", err.Error())
-	}
-
-	return WAVFormat{RIFFChunk: riffChunk}, nil
 }
 
 func (c WAVChunk) WriteHeaders(buffer *bytes.Buffer) {
@@ -36,18 +24,18 @@ func (c WAVChunk) WriteHeaders(buffer *bytes.Buffer) {
 
 func (f WAVFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 
-	// create new WAVE format
-	waveFormat, err := NewWAVFormat(data)
+	// create riff chunk
+	riffChunk, err := NewRIFFChunk(data)
 	if err != nil {
-		return audio.Audio{}, fmt.Errorf("error occurred while decoding WAV: %s", err.Error())
+		return audio.Audio{}, fmt.Errorf("error occurred while decoding RIFF chunk: %s", err.Error())
 	}
 
 	// audio container out of wave format
 	return audio.NewAudio(
-		waveFormat.RIFFChunk.FormatChunk.NumChannels,
-		uint64(waveFormat.RIFFChunk.FormatChunk.SampleRate),
-		waveFormat.RIFFChunk.FormatChunk.BitsPerSample,
-		waveFormat.RIFFChunk.DataChunk.Data,
+		riffChunk.FormatChunk.NumChannels,
+		uint64(riffChunk.FormatChunk.SampleRate),
+		riffChunk.FormatChunk.BitsPerSample,
+		riffChunk.DataChunk.Data,
 		binary.LittleEndian,
 	)
 }
