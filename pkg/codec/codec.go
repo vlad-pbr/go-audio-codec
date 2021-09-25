@@ -8,7 +8,7 @@ import (
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/format"
 )
 
-func Decode(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e error) {
+func DecodeSpecific(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e error) {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -22,6 +22,19 @@ func Decode(data []byte, identifier format.FormatIdentifier) (a audio.Audio, e e
 	}
 
 	return aud, nil
+
+}
+
+func Decode(data []byte) (audio.Audio, error) {
+
+	// find matching format and decode
+	for identifier, format := range format.IdentifierToFormat {
+		if format.IsFormat(data) {
+			return DecodeSpecific(data, identifier)
+		}
+	}
+
+	return audio.Audio{}, fmt.Errorf("audio is either corrupted or is not supported")
 }
 
 func Encode(audio audio.Audio, identifier format.FormatIdentifier) []byte {
