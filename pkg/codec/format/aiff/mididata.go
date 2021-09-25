@@ -19,7 +19,16 @@ func (c MIDIDataChunk) Write(buffer *bytes.Buffer) {
 	binary.Write(buffer, binary.BigEndian, c.MIDIData)
 }
 
-// TODO implement
 func NewMIDIDataChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
-	return MIDIDataChunk{}, nil
+
+	// define chunk struct
+	var midiChunk MIDIDataChunk
+	midiChunk.ChunkID = MIDIDATAID
+	midiChunk.ChunkSize = int32(binary.BigEndian.Uint32(utils.Next(buffer, 4)))
+	midiChunk.MIDIData = utils.Next(buffer, int(midiChunk.ChunkSize))
+
+	adjustForZeroPadding(midiChunk.ChunkSize, buffer)
+
+	return midiChunk, nil
+
 }
