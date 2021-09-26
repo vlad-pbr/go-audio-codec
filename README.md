@@ -24,25 +24,25 @@ import (
 func main() {
 
     // read audio file as bytes
-	data, err := ioutil.ReadFile("path/to/file.aif")
-	if err != nil {
-		panic(fmt.Errorf("could not read file: %s", err.Error()))
-	}
+    data, err := ioutil.ReadFile("path/to/file.aif")
+    if err != nil {
+        panic(fmt.Errorf("could not read file: %s", err.Error()))
+    }
 
     // decode audio bytes to an audio container
-	aud, err := codec.Decode(data)
-	if err != nil {
-		panic(fmt.Errorf("could not decode audio: %s", err.Error()))
-	}
+    aud, err := codec.Decode(data)
+    if err != nil {
+        panic(fmt.Errorf("could not decode audio: %s", err.Error()))
+    }
 
     // display audio info
-	fmt.Println(aud)
+    fmt.Println(aud)
 
     // write audio in WAV format
-	out := codec.Encode(aud, format.WAV)
-	if err := ioutil.WriteFile("path/to/file.wav", out, 0664); err != nil {
-		panic(fmt.Errorf("could not write file: %s", err.Error()))
-	}
+    out := codec.Encode(aud, format.WAV)
+    if err := ioutil.WriteFile("path/to/file.wav", out, 0664); err != nil {
+    	panic(fmt.Errorf("could not write file: %s", err.Error()))
+    }
 
 }
 ```
