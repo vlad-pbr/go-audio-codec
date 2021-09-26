@@ -1,0 +1,5 @@
+The motivation behind creating a single audio container was to have a single generic audio type which provides all of the required information and PCM sample data to be used for playback, encoding and decoding. I've decided to not expose the struct fields so no illegal assignments can be performed. There are getters and shortcut methods to get relevant data. There is also a setter for sample rate as this field is not dependent on other fields and can be changed freely.
+
+There's also the 'order' field which indicates the order of bytes the samples are stored in. This is due to some formats storing the samples in big endian and others in little endian. This should be irrelevant to the end user. A getter for audio samples does request the byte order in order to serve proper samples.
+
+In order to manipulate the sample data, a separate package or library must be implemented which should take care of all the edge cases. It might be a good idea to implement the proper setters here to manipulate data, but this hasn't been done.
