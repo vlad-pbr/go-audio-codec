@@ -6,17 +6,17 @@ import (
 	"fmt"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
-	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/float80"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/extended"
 )
 
 var COMMONID utils.FourCC = [4]byte{67, 79, 77, 77} // COMM
 
 type CommonChunk struct {
 	AIFFChunk
-	NumChannels     int16           // amount of audio channels
-	NumSampleFrames uint32          // sample frame consists of sample per numChannels (= amount of samples / numChannels)
-	SampleSize      int16           // NUMBER OF BITS for single audio sample (value can range from 1 to 32)
-	SampleRate      float80.Float80 // SAMPLE FRAME (not samples themselves) played back / sec
+	NumChannels     int16             // amount of audio channels
+	NumSampleFrames uint32            // sample frame consists of sample per numChannels (= amount of samples / numChannels)
+	SampleSize      int16             // NUMBER OF BITS for single audio sample (value can range from 1 to 32)
+	SampleRate      extended.Extended // SAMPLE FRAME (not samples themselves) played back / sec
 }
 
 func (c CommonChunk) Write(buffer *bytes.Buffer) {
@@ -47,7 +47,7 @@ func NewCommonChunk(buffer *bytes.Buffer) (utils.ChunkInterface, error) {
 	// fill sample rate
 	var sampleRateBytes [10]byte
 	copy(sampleRateBytes[:], utils.Next(buffer, 10))
-	commChunk.SampleRate = float80.NewFromBytes(sampleRateBytes)
+	commChunk.SampleRate = extended.NewFromBytes(sampleRateBytes)
 
 	return commChunk, nil
 }
