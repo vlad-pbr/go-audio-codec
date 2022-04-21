@@ -1,6 +1,6 @@
 
 <p align="center">
-    ![AIFF file structure](/docs/formats/aiff/structure.png)
+    <img src="/docs/formats/aiff/structure.png">
 </p>
 
 AIFF format is a single FORM chunk built out of lots of other 'local' chunks. Most are entirely optional, some can appear multiple times and they can appear in any order. It's worth mentioning that AIFF format is uncompressed and a separate AIFC format exists which does use compression.
@@ -12,7 +12,7 @@ The biggest offender was the sample rate field which is stored in an IEEE 754 ex
 Since Go does not include such data type, it had to be implemented. After some digging I stumbled upon the "[Standard Apple Numerics Environment Manual](/docs/formats/aiff/Standard&#32;Apple&#32;Numerics&#32;Environment&#32;Manual.pdf)" which describes the data types implemented in SANE, including the 'extended' data type (Page 17):
 
 <p align="center">
-    ![SANE Manual, Page 17 Snippet](/docs/formats/aiff/sane-manual-page-17-snippet.png)
+    <img src="/docs/formats/aiff/sane-manual-page-17-snippet.png">
 </p>
 
 SANE extended data type appears to conform to [IEEE 754 x86 extended precision floating point format](https://en.wikipedia.org/wiki/Extended_precision#Extended_precision_implementations), therefore it can be implemented as such. The `Extended` container was implemented which can get/set the type using float64/bytes. I've decided to implement the byte to float64 conversion exactly as specified in the SANE manual. [mewmew's implementation of float80](https://github.com/mewspring/mewmew-l/blob/c756be720bb0/internal/float80/float80.go) has also helped me implement the float64 to byte logic.
