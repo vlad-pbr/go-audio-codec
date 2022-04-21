@@ -38,13 +38,21 @@ func (ext Extended) Float64() float64 {
 	i := ext.right & uint64(9223372036854775808) >> 63
 	f := float64(0)
 
-	// TODO edge cases with NaN and Inf
-
 	// decode mantissa
 	for _f, mask, exponent := ext.right&uint64(9223372036854775807), uint64(4611686018427387904), 0.5; mask != 0; mask, exponent = mask>>1, exponent/2 {
 		if _f&mask > 0 {
 			f += exponent
 		}
+	}
+
+	// handle +-Inf
+	if e == 32767 && f == 0 {
+		return math.Pow(-1, float64(s)) * math.Inf(1)
+	}
+
+	// handle NaN
+	if e == 32767 && f != 0 {
+		return math.NaN()
 	}
 
 	return math.Pow(-1, float64(s)) * math.Pow(2, float64(e-BIAS)) * (float64(i) + f)
