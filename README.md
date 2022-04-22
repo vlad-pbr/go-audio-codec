@@ -4,7 +4,7 @@ Audio codec written purely in go. Currently supports encoding and decoding for t
 - WAV (Canonical)
 - AIFF
 
-This is a personal project developed as a part of a bigger project of mine. Documentation for different parts of the codec is available in the appropriate READMEs.
+This is a personal project developed as a part of a bigger project of mine. Documentation for different parts of the codec is available in READMEs within subdirectories as well as [docs](/docs).
 
 ## Example
 
