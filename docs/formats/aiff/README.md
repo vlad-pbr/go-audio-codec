@@ -1,0 +1,1 @@
+../../../pkg/codec/format/aiff/README.md

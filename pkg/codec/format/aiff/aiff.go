@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"math/big"
 
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/audio"
 	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils"
-	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/float80"
+	"github.com/vlad-pbr/go-audio-codec/pkg/codec/utils/extended"
 )
 
 type AIFFFormat struct {
@@ -62,7 +61,7 @@ func (f AIFFFormat) Decode(data *bytes.Buffer) (audio.Audio, error) {
 	}
 
 	// calculate samplerate from extended precision float bytes
-	sampleRate, _ := formChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float().Uint64()
+	sampleRate := uint64(formChunk.LocalChunks[commonChunkIndex].(CommonChunk).SampleRate.Float64())
 	samplesLen := len(formChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).SoundData)
 	samplesOffset := int(formChunk.LocalChunks[soundChunkIndex].(SoundDataChunk).Offset)
 
@@ -97,7 +96,7 @@ func (f AIFFFormat) Encode(audio audio.Audio, buffer *bytes.Buffer) {
 				NumChannels:     int16(audio.NumChannels()),
 				NumSampleFrames: uint32(audio.SamplesAmount()),
 				SampleSize:      int16(audio.BitDepth()),
-				SampleRate:      float80.NewFromFloat(new(big.Float).SetPrec(64).SetFloat64(float64(audio.SampleRate()))),
+				SampleRate:      extended.NewFromFloat64(float64(audio.SampleRate())),
 			},
 			SoundDataChunk{
 				AIFFChunk: AIFFChunk{
