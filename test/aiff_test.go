@@ -14,3 +14,7 @@ func TestIsFormat_AIFF(t *testing.T) {
 func TestDecode_AIFF(t *testing.T) {
 	suite.Decode(t, format.AIFF, "samples/aiff/M1F1-int24-AFsp.aif", "samples/aiff/M1F1-int32-AFsp.aif")
 }
+
+func TestEncode_AIFF(t *testing.T) {
+	suite.Encode(t, format.AIFF, format.WAV, "samples/aiff/M1F1-int24-AFsp.aif")
+}

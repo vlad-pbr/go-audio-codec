@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"math"
@@ -80,6 +81,13 @@ func (a Audio) String() string {
 
 func (a Audio) ByteDepth() int {
 	return int(math.Ceil(float64(a.bitDepth) / 8))
+}
+
+func (a Audio) Equal(b Audio) bool {
+	return a.numChannels == b.numChannels &&
+		a.sampleRate == b.sampleRate &&
+		a.bitDepth == b.bitDepth &&
+		bytes.Equal(a.samples, b.samples)
 }
 
 func (a *Audio) toggleEndianness() {
